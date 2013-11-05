@@ -3,6 +3,7 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Guzzle\Http\Client;
 
 class HubDropController extends Controller
@@ -23,6 +24,16 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
+    // Mirror it?
+    $request = $this->get('request');
+    if ($request->query->get('mirror')){
+      $repos_path = "/var/hubdrop/repos";
+      exec("hubdrop-create-mirror $project_name $repos_path");
+    }
+
+    // $_POST parameters
+    $request->request->get('name');
+
     // Create a client and provide a base URL
     $client = new Client('http://drupal.org');
 
