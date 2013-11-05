@@ -7,9 +7,11 @@
     <p>Welcome to HubDrop</p>
     <h2>{{ project_name }}</h2>
 
+    {% if project_ok %}
     <ul>
       <li><a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a></li>
       <li><a href="{{ project_drupal_git }}">{{ project_drupal_git }}</a></li>
     </ul>
+    {% endif %}
 
 {% endblock %}

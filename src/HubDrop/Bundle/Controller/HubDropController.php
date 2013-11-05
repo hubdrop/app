@@ -25,9 +25,13 @@ class HubDropController extends Controller
      * or @Template annotation as demonstrated in DemoController.
      *
      */
-    $params['project_name'] = $project_name;
-    $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
-    $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name";
+    $params['project_ok'] = TRUE;
+
+    if ($params['project_ok']){
+      $params['project_name'] = $project_name;
+      $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
+      $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name";
+    }
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
   }
 }
