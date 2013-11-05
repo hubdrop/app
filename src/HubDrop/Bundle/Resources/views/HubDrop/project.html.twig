@@ -3,8 +3,6 @@
 {% block content_header '' %}
 
 {% block content %}
-
-    <p>Welcome to HubDrop</p>
     <h2>{{ project_name }}</h2>
 
     {% if project_ok %}
@@ -12,6 +10,8 @@
       <li><a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a></li>
       <li><a href="{{ project_drupal_git }}">{{ project_drupal_git }}</a></li>
     </ul>
+    {% else %}
+      <p><a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a> not found on Drupal.org.</p>
     {% endif %}
 
 {% endblock %}

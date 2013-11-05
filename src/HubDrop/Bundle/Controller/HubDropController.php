@@ -3,6 +3,7 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Guzzle\Http\Client;
 
 class HubDropController extends Controller
 {
@@ -20,16 +21,24 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
-    /*
-     * The action's view can be rendered using render() method
-     * or @Template annotation as demonstrated in DemoController.
-     *
-     */
-    $params['project_ok'] = TRUE;
+    // Create a client and provide a base URL
+    $client = new Client('http://drupal.org');
 
-    if ($params['project_ok']){
-      $params['project_name'] = $project_name;
-      $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
+    // Look for drupal.org/project/{project_name}
+    try {
+      $response = $client->get('/project/' . $project_name)->send();
+      $project_ok = TRUE;
+    } catch (\Guzzle\Http\Exception\BadResponseException $e) {
+      $project_ok = FALSE;
+    }
+
+    // Build template params
+    $params = array();
+    $params['project_name'] = $project_name;
+    $params['project_ok'] = $project_ok;
+    $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
+
+    if ($project_ok){
       $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name";
     }
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
