@@ -1,6 +1,7 @@
 _home:
-    pattern:  /
+    path:  /
     defaults: { _controller: HubDropBundle:HubDrop:home }
 _project:
-    pattern:  /project/%name
+    path:  /project/{project_name}
     defaults: { _controller: HubDropBundle:HubDrop:project }
+    
