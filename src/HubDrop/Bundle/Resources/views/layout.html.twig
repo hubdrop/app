@@ -1,36 +1,48 @@
-{% extends "TwigBundle::layout.html.twig" %}
+{# app/Resources/views/base.html.twig #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{% block htmltitle %}HubDrop{% endblock %}</title>
 
-{% block head %}
-    <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
-{% endblock %}
+          {% block head %}
+              <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+          {% endblock %}
+    </head>
+    <body>
+        <div id="content">
 
-{% block title 'HubDrop.io' %}
+          <h1>{% block title 'HubDrop.io' %}</h1>
 
-{% block body %}
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="flash-message">
-            <em>Notice</em>: {{ flashMessage }}
+          {% block body %}
+              {% for flashMessage in app.session.flashbag.get('notice') %}
+                  <div class="flash-message">
+                      <em>Notice</em>: {{ flashMessage }}
+                  </div>
+              {% endfor %}
+
+              {% block content_header %}
+                  <ul id="menu">
+                      {% block content_header_more %}
+                          <li><a href="{{ path('_demo') }}">Demo Home</a></li>
+                      {% endblock %}
+                  </ul>
+
+                  <div style="clear: both"></div>
+              {% endblock %}
+
+              <div class="block">
+                  {% block content %}{% endblock %}
+              </div>
+
+              {% if code is defined %}
+                  <h2>Code behind this page</h2>
+                  <div class="block">
+                      <div class="symfony-content">{{ code|raw }}</div>
+                  </div>
+              {% endif %}
+          {% endblock %}
+
         </div>
-    {% endfor %}
-
-    {% block content_header %}
-        <ul id="menu">
-            {% block content_header_more %}
-                <li><a href="{{ path('_demo') }}">Demo Home</a></li>
-            {% endblock %}
-        </ul>
-
-        <div style="clear: both"></div>
-    {% endblock %}
-
-    <div class="block">
-        {% block content %}{% endblock %}
-    </div>
-
-    {% if code is defined %}
-        <h2>Code behind this page</h2>
-        <div class="block">
-            <div class="symfony-content">{{ code|raw }}</div>
-        </div>
-    {% endif %}
-{% endblock %}
+    </body>
+</html>
