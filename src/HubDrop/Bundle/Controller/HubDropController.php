@@ -13,7 +13,9 @@ class HubDropController extends Controller
   public function homeAction()
   {
     // @TODO: Goto Project form
-    return $this->render('HubDropBundle:HubDrop:home.html.twig');
+    return $this->render('HubDropBundle:HubDrop:home.html.twig', array(
+      'site_base_url' => $this->getRequest()->getHost(),
+    ));
   }
 
   /**
