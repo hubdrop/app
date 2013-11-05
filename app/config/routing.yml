@@ -1,0 +1,4 @@
+
+# AcmeDemoBundle routes (to be removed)
+_hubdrop:
+    resource: "@HubDropBundle/Resources/config/routing.yml"
