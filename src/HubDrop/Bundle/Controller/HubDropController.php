@@ -35,33 +35,49 @@ class HubDropController extends Controller
    */
   private function mirrorProject($project_name)
   {
-    // @TODO:
-    //  1. Initiate GitHub API and create a repo.
-    //  2. exec hubdrop-create-mirror.
-    //  3. Replace exec with a jenkins job.
+    $stop_process = FALSE;
 
+    // Connect to GitHub and create a Repo for $project_name
     // From https://github.com/KnpLabs/php-github-api/blob/master/doc/repos.md
     $client = new GithubClient();
     $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
 
-    $repo = $client->api('repo')->create($project_name, 'Mirror of drupal.org provided by hubdrop.io', 'http://drupal.org/project/' . $project_name, true, $this->github_org);
+    try {
+      $repo = $client->api('repo')->create($project_name, 'Mirror of drupal.org provided by hubdrop.io', 'http://drupal.org/project/' . $project_name, true, $this->github_org);
+      $output = "GitHub Repo created at " . $repo['html_url'];
+    }
+    catch (\Github\Exception\ValidationFailedException $e) {
+      // For now we assume this is just a
+      // "Validation Failed: name already exists on this account
+      if ($e->getCode() == 422){
+        $output = '<p>Repo already exists on github: http://github.com/' . $this->github_org . '/' . $project_name . '</p>';
+      }
+      else {
+        $output = $e->getMessage();
+        $stop_process = TRUE;
+      }
+    }
 
-    $message = "A repo on GitHub has been created.  Commits should appear shortly. " . $repo['html_url'];
-
-    // @TODO: Figure out symfony messages to notify the user.
-    return $this->projectAction($project_name, $message);
+    if (!$stop_process) {
+      $cmd = "hubdrop-create-repo $project_name $this->repo_path";
+      $output .= '<p>Mirroring Repo...</p>';
+      $output .= "<p>Running $cmd</p>";
+      $output .= '<pre>' . shell_exec($cmd) . '</pre>';
+    }
+    return new Response($output);
+    //return $this->redirect('/project/' . $project_name);
   }
 
   /**
    * Project View Page
    */
-  public function projectAction($project_name, $message = '')
+  public function projectAction($project_name)
   {
 
     $params = array();
     $params['project_ok'] = FALSE;
     $params['project_cloned'] = FALSE;
-    $params['message'] = $message;
+    $params['message'] = '';
 
     $go_mirror = $this->get('request')->query->get('mirror');
 
