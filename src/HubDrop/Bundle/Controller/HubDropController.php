@@ -66,7 +66,7 @@ class HubDropController extends Controller
     }
 
     if (!$stop_process) {
-      $cmd = "hubdrop-create-repo $project_name $this->repo_path";
+      $cmd = "hubdrop-create-mirror $project_name $this->repo_path";
       $output .= '<p>Mirroring Repo...</p>';
       $output .= "<p>Running $cmd</p>";
       $output .= '<pre>' . shell_exec($cmd) . '</pre>';
