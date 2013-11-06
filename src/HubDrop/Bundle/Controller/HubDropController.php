@@ -8,6 +8,9 @@ use Guzzle\Http\Client;
 
 class HubDropController extends Controller
 {
+  private $repo_path = '/var/hubdrop/repos';
+  private $github_org = 'hubdrop-projects';
+
   /**
    * Homepage
    */
@@ -24,35 +27,41 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
-    // Mirror it?
+    $params = array();
+    $params['project_ok'] = FALSE;
+    $params['project_cloned'] = FALSE;
+
+    // Action: Mirror it?
     $request = $this->get('request');
     if ($request->query->get('mirror')){
-      $repos_path = "/var/hubdrop/repos";
-      exec("hubdrop-create-mirror $project_name $repos_path");
+      $output = shell_exec("hubdrop-create-mirror $project_name $this->repo_path");
+      print $output; exit();
     }
 
-    // $_POST parameters
-    $request->request->get('name');
-
-    // Create a client and provide a base URL
-    $client = new Client('http://drupal.org');
-
-    // Look for drupal.org/project/{project_name}
-    try {
-      $response = $client->get('/project/' . $project_name)->send();
-      $project_ok = TRUE;
-    } catch (\Guzzle\Http\Exception\BadResponseException $e) {
-      $project_ok = FALSE;
+    // If local repo exists...
+    if (file_exists($this->repo_path . '/' . $project_name . '.git')){
+      $params['project_cloned'] = TRUE;
+      $params['github_web_url'] = "http://github.com/" . $this->github_org . '/' . $project_name;
+      $params['project_ok'] = TRUE;
+    }
+    // Else If local repo doesn't exist...
+    else {
+      // Look for drupal.org/project/{project_name}
+      $client = new Client('http://drupal.org');
+      try {
+        $response = $client->get('/project/' . $project_name)->send();
+        $params['project_ok'] = TRUE;
+      } catch (\Guzzle\Http\Exception\BadResponseException $e) {
+        $params['project_ok'] = FALSE;
+      }
     }
 
     // Build template params
-    $params = array();
     $params['project_name'] = $project_name;
-    $params['project_ok'] = $project_ok;
     $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
 
-    if ($project_ok){
-      $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name";
+    if ($params['project_ok']){
+      $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name.git";
     }
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
   }
