@@ -6,11 +6,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
+use Github\Client as GithubClient;
 
 class HubDropController extends Controller
 {
   private $repo_path = '/var/hubdrop/repos';
   private $github_org = 'hubdrop-projects';
+
+  /**
+   * This was retrieved using a github username and password with curl:
+   * curl -i -u <github_username> -d '{"scopes": ["repo"]}' https://api.github.com/authorizations
+   */
+  private $github_application_token = 'af25172c6b5dd7e2ae29d1eb98636314588f0c28';
 
   /**
    * Homepage
@@ -32,18 +39,29 @@ class HubDropController extends Controller
     //  1. Initiate GitHub API and create a repo.
     //  2. exec hubdrop-create-mirror.
     //  3. Replace exec with a jenkins job.
-    return new Response("mirroring $project_name...");
+
+    // From https://github.com/KnpLabs/php-github-api/blob/master/doc/repos.md
+    $client = new GithubClient();
+    $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
+
+    $repo = $client->api('repo')->create($project_name, 'Mirror of drupal.org provided by hubdrop.io', 'http://drupal.org/project/' . $project_name, true, $this->github_org);
+
+    $message = "A repo on GitHub has been created.  Commits should appear shortly. " . $repo['html_url'];
+
+    // @TODO: Figure out symfony messages to notify the user.
+    return $this->projectAction($project_name, $message);
   }
 
   /**
    * Project View Page
    */
-  public function projectAction($project_name)
+  public function projectAction($project_name, $message = '')
   {
 
     $params = array();
     $params['project_ok'] = FALSE;
     $params['project_cloned'] = FALSE;
+    $params['message'] = $message;
 
     $go_mirror = $this->get('request')->query->get('mirror');
 
