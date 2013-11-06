@@ -5,11 +5,10 @@
 {% block content %}
     <h2>{{ project_name }}</h2>
 
-
     {% if project_cloned %}
     <p><em>{{ project_name }} is mirrored at <a href="{{ github_web_url }}">{{ github_web_url }}</a></em></p>
     {% else %}
-    <p><em>This project is not mirrored on GitHub.</em></p>
+    <p><em>This project is not mirrored on GitHub.  <a href='?mirror=go'>Mirror on GitHub</a></em></p>
 
     {% endif %}
 
