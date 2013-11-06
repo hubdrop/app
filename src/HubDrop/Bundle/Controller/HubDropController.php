@@ -119,7 +119,7 @@ class HubDropController extends Controller
       $output = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $project_name);
     }
 
-    return new Response($output);
-    //return $this->redirect('/project/' . $project_name);
+    //return new Response($output);
+    return $this->redirect('/project/' . $project_name);
   }
 }
