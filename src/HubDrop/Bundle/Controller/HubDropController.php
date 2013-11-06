@@ -4,6 +4,7 @@ namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
 
 class HubDropController extends Controller
@@ -23,20 +24,28 @@ class HubDropController extends Controller
   }
 
   /**
+   * Mirror a Project.
+   */
+  private function mirrorProject($project_name)
+  {
+    // @TODO:
+    //  1. Initiate GitHub API and create a repo.
+    //  2. exec hubdrop-create-mirror.
+    //  3. Replace exec with a jenkins job.
+    return new Response("mirroring $project_name...");
+  }
+
+  /**
    * Project View Page
    */
   public function projectAction($project_name)
   {
+
     $params = array();
     $params['project_ok'] = FALSE;
     $params['project_cloned'] = FALSE;
 
-    // Action: Mirror it?
-    $request = $this->get('request');
-    if ($request->query->get('mirror')){
-      $output = shell_exec("hubdrop-create-mirror $project_name $this->repo_path");
-      print $output; exit();
-    }
+    $go_mirror = $this->get('request')->query->get('mirror');
 
     // If local repo exists...
     if (file_exists($this->repo_path . '/' . $project_name . '.git')){
@@ -51,6 +60,14 @@ class HubDropController extends Controller
       try {
         $response = $client->get('/project/' . $project_name)->send();
         $params['project_ok'] = TRUE;
+
+        // Mirror: GO!
+        // We only want to try to mirror a project if not yet cloned and it
+        // exists.
+        if ($go_mirror == 'go'){
+          return $this->mirrorProject($project_name);
+        }
+
       } catch (\Guzzle\Http\Exception\BadResponseException $e) {
         $params['project_ok'] = FALSE;
       }
