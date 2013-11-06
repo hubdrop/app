@@ -24,7 +24,14 @@ class HubDropController extends Controller
    */
   public function homeAction()
   {
-    // @TODO: Goto Project form
+    //
+    $project_name = $this->get('request')->query->get('project_name');
+    if ($project_name){
+      return $this->redirect($this->generateUrl('_project', array(
+        'project_name' => $project_name
+      )));
+    }
+
     return $this->render('HubDropBundle:HubDrop:home.html.twig', array(
       'site_base_url' => $this->getRequest()->getHost(),
     ));
