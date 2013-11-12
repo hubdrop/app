@@ -2,16 +2,21 @@
   padding: 40px 15px;
   text-align: center;
 }
-
-input.project.form-control {
-  width: 130px;
-  display: inline;
-}
-
 .jumbotron h1 {
   position: relative;
   font-size: 63px !important;
   line-height: 14pt;
+}
+ #project-go-form {
+  margin: 0px 5%;
+  max-width: 400px;
+ }
+
+
+@media screen and (min-width: 400px){
+  #project-go-form {
+    margin: 0px auto;
+  }
 }
 
 #mirror-status-label {

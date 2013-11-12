@@ -4,9 +4,16 @@
 
 {% block content %}
 
-    <form>
-      <code class='inline'>http://drupal.org/project/</code><input type="textfield" placeholder="project_name" name="project_name" class="form-control project" required autofocus>
-      <input type="submit" value="Go" class="btn btn-sm btn-success">
+    <a href="https://github.com/hubdrop/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <form id="project-go-form" class="text-center">
+      <div class="input-group">
+        <span class="input-group-addon">http://drupal.org/project/</span>
+        <input type="text"  class="form-control project" placeholder="Project Name" name="project_name"  required autofocus>
+        <span class="input-group-btn">
+          <input type="submit" value="Go" class="btn btn-success">
+        </span>
+      </div>
     </form>
-  
+
 {% endblock %}
