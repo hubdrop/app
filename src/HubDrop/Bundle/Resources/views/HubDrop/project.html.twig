@@ -3,23 +3,50 @@
 {% block content_header '' %}
 
 {% block content %}
-    <h2>{{ project_name }}</h2>
 
-    {% if project_exists %}
+    <div class="jumbotron">
+      <h1 class="panel-title">{{ project_name }}
+      <small id="mirror-status-label">
+        {% if project_mirrored %}
+          <a href="{{github_web_url}}" class="label label-success">Mirrored on GitHub</a>
+        {% else %}
+          <span class="label label-danger">Not Mirrored on GitHub</span>
+        {% endif %}
+      </small>
+      </h1>
 
-      {% if project_cloned %}
-      <p><em>{{ project_name }} is mirrored at <a href="{{ github_web_url }}">{{ github_web_url }}</a></em></p>
+
+      {% if project_mirrored %}
+        <p>
+          This module is mirrored on GitHub, at <a href="{{github_web_url}}" class="text-muted">{{github_web_url}}</a>.
+        </p>
+        <p>
+          ALPHA NOTICE: This repo is not yet updated automatically.  See <a href="https://github.com/hubdrop/issues/issues/1">HubDrop issue #1</a> for details.
+        </p>
       {% else %}
-      <p><em>This project is not mirrored on GitHub.  <a href='?mirror=go'>Mirror on GitHub</a></em></p>
-
+        <p>
+          This module is not yet mirrored on GitHub.  Hit the Big Blue Button
+          below to mirror it to <a href="{{github_web_url}}" class="text-muted">{{github_web_url}}</a>.
+        </p>
+        <p id="mirror-button" class="text-center">
+          <a href='?mirror=go' class="btn btn-success btn-lg"><span class="glyphicon glyphicon-transfer"></span> Mirror {{ project_name }} On GitHub</a>
+        </p>
       {% endif %}
 
-    <ul>
-      <li><a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a></li>
-      <li><a href="{{ project_drupal_git }}">{{ project_drupal_git }}</a></li>
-    </ul>
-    {% else %}
-      <p><a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a> not found on Drupal.org.</p>
-    {% endif %}
 
+
+      {% if project_exists %}
+        <div id="drupal-info" class="panel panel-info">
+          <div class="panel-heading">
+            Drupal.org Links
+          </div>
+        <div class="list-group">
+          <a href="{{ project_drupal_url }}" class="list-group-item">{{ project_drupal_url }}</a>
+          <a href="{{ project_drupal_git }}" class="list-group-item">{{ project_drupal_git }}</a>
+        </div>
+        {% else %}
+          <a href="{{ project_drupal_url }}">{{ project_drupal_url }}</a> not found on Drupal.org.
+        {% endif %}
+      </div>
+</div>
 {% endblock %}

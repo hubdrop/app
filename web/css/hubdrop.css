@@ -1,4 +1,4 @@
-#content {
+#header {
   padding: 40px 15px;
   text-align: center;
 }
@@ -6,4 +6,23 @@
 input.project.form-control {
   width: 130px;
   display: inline;
+}
+
+.jumbotron h1 {
+  position: relative;
+  font-size: 63px !important;
+  line-height: 14pt;
+}
+
+#mirror-status-label {
+  font-size: 14pt !important;
+  margin-left: 20px;
+}
+
+#drupal-info {
+  margin-top: 30px;
+}
+
+#mirror-button {
+  margin: 40px 0px;
 }
