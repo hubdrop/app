@@ -44,37 +44,62 @@ class HubDropController extends Controller
   public function projectAction($project_name)
   {
 
+    // Default twig variables
     $params = array();
-    $params['project_ok'] = FALSE;
-    $params['project_cloned'] = FALSE;
+    $params['project_cloned'] = FALSE;    // Cloned Locally
+    $params['project_mirrored'] = FALSE;  // On GitHub
+    $params['project_exists'] = FALSE;    // On drupal.org
     $params['message'] = '';
 
-    $go_mirror = $this->get('request')->query->get('mirror');
+    $params['github_web_url'] = 'http://github.com/' . $this->github_org . '/' . $project_name;
+    $params['local_clone_path'] = $this->repo_path . '/' . $project_name . '.git';
 
     // @TODO: Figure out how to cache this, or rig it up so it is faster.
-    // Lookup GitHub project.
-    $params['github_web_url'] = 'http://github.com/' . $this->github_org . '/' . $project_name;
-    $client = new Client("http://github.com");
 
-    try {
-      $response = $client->get('/' . $this->github_org . '/' . $project_name)->send();
+    // Check Steps:
+    //  1. Check for local path.
+    //  2. Check for Public github repo, if local path is missing. (This is
+    //       really just for easy local development.  Allows the web app to work
+    //       without having all the repos cloned.
+    //  3. Check for drupal.org project.
+
+    // If we have a local clone...
+    if (file_exists($params['local_clone_path'])){
       $params['project_cloned'] = TRUE;
-    } catch (\Guzzle\Http\Exception\BadResponseException $e) {
+      $params['project_mirrored'] = TRUE;
+      $params['project_exists'] = TRUE;
+      // We will assume it exists on github if we have a local clone, to save
+      // the extra request to github.
+    }
+    // If we don't have a local clone, ping github to see if it is already mirrored.
+    else {
       $params['project_cloned'] = FALSE;
+
+      // Lookup GitHub project.
+      // @TODO: Should we only do this in dev environments?
+      $client = new Client("http://github.com");
+      try {
+        $response = $client->get('/' . $this->github_org . '/' . $project_name)->send();
+        $params['project_mirrored'] = TRUE;
+        $params['project_exists'] = TRUE;
+
+      } catch (\Guzzle\Http\Exception\BadResponseException $e) {
+        $params['project_mirrored'] = FALSE;
+      }
     }
 
-    // If project does't exist on GitHub, confirm it is really a drupal project.
-    if ($params['project_cloned'] == FALSE) {
+    // If project is not yet mirrored, confirm it is really a drupal project.
+    if ($params['project_mirrored'] == FALSE) {
       // Look for drupal.org/project/{project_name}
       $client = new Client('http://drupal.org');
       try {
         $response = $client->get('/project/' . $project_name)->send();
         $params['project_exists'] = TRUE;
 
+        // @TODO: Break out into its own route. Require a POST? Symfony Form API?
         // Mirror: GO!
-        // We only want to try to mirror a project if not yet cloned and it
-        // exists.
-        if ($go_mirror == 'go'){
+        // We only want to try to mirror a project if not yet cloned and it exists.
+        if ($this->get('request')->query->get('mirror') == 'go'){
           return $this->mirrorProject($project_name);
         }
 
