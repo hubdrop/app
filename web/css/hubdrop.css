@@ -1,0 +1,9 @@
+#content {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+input.project.form-control {
+  width: 130px;
+  display: inline;
+}
