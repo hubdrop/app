@@ -5,7 +5,7 @@
 {% block content %}
     <h2>{{ project_name }}</h2>
 
-    {% if project_ok %}
+    {% if project_exists %}
 
       {% if project_cloned %}
       <p><em>{{ project_name }} is mirrored at <a href="{{ github_web_url }}">{{ github_web_url }}</a></em></p>
