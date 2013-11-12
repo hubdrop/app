@@ -1,0 +1,10 @@
+{
+  "vars": {},
+  "css": [
+    "type.less",
+    "forms.less",
+    "buttons.less",
+    "alerts.less"
+  ],
+  "js": []
+}
