@@ -21,7 +21,7 @@ class HubDropController extends Controller
   private $github_application_token = 'af25172c6b5dd7e2ae29d1eb98636314588f0c28';
 
   /**
-   * Homepage
+   * Route: Homepage
    */
   public function homeAction()
   {
@@ -39,7 +39,7 @@ class HubDropController extends Controller
   }
 
   /**
-   * Project View Page
+   * Route: Project View Page
    */
   public function projectAction($project_name)
   {
