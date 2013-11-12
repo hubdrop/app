@@ -51,6 +51,7 @@ class HubDropController extends Controller
 
     $go_mirror = $this->get('request')->query->get('mirror');
 
+    // @TODO: Look for github repo instead
     // If local repo exists...
     if (file_exists($this->repo_path . '/' . $project_name . '.git')){
       $params['project_cloned'] = TRUE;
