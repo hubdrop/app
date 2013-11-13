@@ -18,7 +18,7 @@ class HubDropController extends Controller
    * This was retrieved using a github username and password with curl:
    * curl -i -u <github_username> -d '{"scopes": ["repo"]}' https://api.github.com/authorizations
    */
-  private $github_application_token = 'af25172c6b5dd7e2ae29d1eb98636314588f0c28';
+  private $github_application_token = '2f3a787bc2881ac86d0277b37c1b9a67c4c509bb';
 
   /**
    * Route: Homepage
