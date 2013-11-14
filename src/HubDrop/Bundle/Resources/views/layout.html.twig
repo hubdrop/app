@@ -1,64 +1,75 @@
 {# app/Resources/views/base.html.twig #}
 <!DOCTYPE html>
 <html>
-    <head>
-      <title>{% block htmltitle %}HubDrop{% endblock %}</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <title>{% block htmltitle %}HubDrop{% endblock %}</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Bootstrap -->
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/hubdrop.css" rel="stylesheet">
-
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-
-          {% block head %}
-              <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
-          {% endblock %}
-
+      <!-- Bootstrap -->
       <link href="/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body>
-        <div id="header">
-          <a href='{{ path('_home') }}'><img src='/img/logo.png'></a>
+      <link href="/css/hubdrop.css" rel="stylesheet">
 
-          <h1><a href='{{ path('_home') }}'>{% block title 'HubDrop.io' %}</a></h1>
-          <p class='lead'>Mirror drupal.org projects on GitHub.</p>
-        </div>
-        <div id="content">
-          {% block body %}
-              {% for flashMessage in app.session.flashbag.get('notice') %}
-                  <div class="flash-message">
-                      <em>Notice</em>: {{ flashMessage }}
-                  </div>
-              {% endfor %}
+      <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+      <![endif]-->
 
-              <div class="block">
-                  {% block content %}{% endblock %}
+        {% block head %}
+            <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+        {% endblock %}
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="header">
+      <a href='{{ path('_home') }}'><img src='/img/logo.png'></a>
+
+      <h1><a href='{{ path('_home') }}'>{% block title 'HubDrop.io' %}</a></h1>
+      <p class='lead'>Mirror drupal.org projects on GitHub.</p>
+    </div>
+    <div id="content">
+      {% block body %}
+          {% for flashMessage in app.session.flashbag.get('notice') %}
+              <div class="flash-message">
+                  <em>Notice</em>: {{ flashMessage }}
               </div>
-          {% endblock %}
+          {% endfor %}
 
-      <div class="container" id="footer-message" >
-        <div class="page col-sm-12" >
-          <p class="text-warning text-center">
-            <a href="http://hubdrop.io">hubdrop</a> is fully Open Source.
-          </p>
-          <p class="text-center">
-            <a href="http://github.com/hubdrop">Code</a> -
-            <a href="http://github.com/hubdrop/issues">Issues</a> -
-            <a href='/about' title="About HubDrop">About</a> -
-            <a href='http://twitter.com/hubdrop' title="About HubDrop">Twitter</a>
-          </p>
-          <p class="text-center">
-            <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://hubdrop.io" data-text="Now Mirroring: Your @Drupal projects on @GitHub!" data-related="hubdrop" data-hashtags="drupal" data-dnt="true">Tweet</a>
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-          </p>
-        </div>
+          <div class="block">
+              {% block content %}{% endblock %}
+          </div>
+      {% endblock %}
+    </div>
+    <div class="container" id="footer-message" >
+      <div class="page col-sm-12" >
+        <p class="text-warning text-center">
+          <a href="http://hubdrop.io">hubdrop</a> is fully Open Source.
+        </p>
+        <p class="text-center">
+          <a href="http://github.com/hubdrop">Code</a> -
+          <a href="http://github.com/hubdrop/issues">Issues</a> -
+          <a href='/about' title="About HubDrop">About</a> -
+          <a href='http://twitter.com/hubdrop' title="About HubDrop">Twitter</a>
+        </p>
+        <p class="text-center">
+        </p>
       </div>
-    </body>
+    </div>
+    <div id="share-bar">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://hubdrop.io" data-text="Now Mirroring: Your @Drupal projects on @GitHub!" data-related="hubdrop" data-hashtags="drupal" data-dnt="true">Tweet</a>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+<div class="g-plusone" data-size="medium" data-href="http://hubdrop.io"></div>
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+    </div>
+  </body>
 </html>
