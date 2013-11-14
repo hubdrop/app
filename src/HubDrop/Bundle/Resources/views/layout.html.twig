@@ -25,7 +25,7 @@
     </head>
     <body>
         <div id="header">
-          <img src='/img/logo.png'>
+          <a href='{{ path('_home') }}'><img src='/img/logo.png'></a>
 
           <h1><a href='{{ path('_home') }}'>{% block title 'HubDrop.io' %}</a></h1>
           <p class='lead'>Mirror drupal.org projects on GitHub.</p>
@@ -43,10 +43,19 @@
               </div>
           {% endblock %}
 
-      <div class="container">
+      <div class="container" id="footer-message" >
         <div class="page col-sm-12" >
-          <p id="footer-message" class="text-warning text-center">
+          <p class="text-warning text-center">
             <a href="http://hubdrop.io">hubdrop</a> is under active development, which means <a href="http://github.com/hubdrop/issues">most things</a> don't work yet.  <a href="http://github.com/hubdrop">Want to help?</a>
+          </p>
+          <p class="text-center">
+            <a href='/about' title="About HubDrop"><span class="glyphicon glyphicon-question-sign text-muted"></span></a>
+          </p>
+          <p class="text-center">
+            <a href="https://twitter.com/hubdrop" class="twitter-follow-button" data-show-count="false" data-dnt="true">Follow @hubdrop</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://hubdrop.io" data-text="Now Mirroring: Drupal Projects on GitHub!" data-related="hubdrop" data-hashtags="drupal" data-dnt="true">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           </p>
         </div>
       </div>

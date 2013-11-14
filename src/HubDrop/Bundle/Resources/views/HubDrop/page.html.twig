@@ -3,23 +3,10 @@
 {% block content_header '' %}
 
 {% block content %}
-<div class="container">
-  <div class="page col-sm-12" >
-    <p>
-      HubDrop.io provides mirroring of drupal.org projects on GitHub as a free public service.
-    </p>
-    <p>
-    Drupal.org's git hosting or issue tracking will not be able to move to GitHub.com anytime soon, so hubdrop will act as a bridge for developers who wish to leverage GitHub for their projects, yet stay connected with the drupal.org community.
-    </p>
-    <p>
-    HubDrop itself is fully open source, anyone can fork and improve the code. Hubdrop code includes chef recipes and a Vagrantfile, making deployment and development easy.
-    </p>
-    <p>
-Plans for the future include allowing projects to move to GitHub as the primary repo, with mirroring or releases being sent back to drupal.org. Creating git repos from makefiles for Drupal distributions would also be possible.
-    </p>
-    <p>
-      HubDrop.io is brought to you by <a href='http://thinkdrop.net'>THINKDROP</a>.
-    </p>
-  </div>
+
+    <a href="https://github.com/hubdrop/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+<div class="container page">
+  {{ content|raw }}
 </div>
 {% endblock %}
