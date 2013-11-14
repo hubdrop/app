@@ -14,7 +14,7 @@
    height="100"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="/home/jon/Repos/hubdrop/logo.png"
    inkscape:export-xdpi="900"
@@ -75,11 +75,11 @@
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="0.88235294"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="155.82488"
-     inkscape:cy="108.77658"
+     inkscape:cx="44.141764"
+     inkscape:cy="51.633723"
      inkscape:document-units="px"
      inkscape:current-layer="g4309"
      showgrid="false"
@@ -87,11 +87,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1052"
-     inkscape:window-x="1080"
-     inkscape:window-y="406"
-     inkscape:window-maximized="1"
+     inkscape:window-width="561"
+     inkscape:window-height="519"
+     inkscape:window-x="555"
+     inkscape:window-y="358"
+     inkscape:window-maximized="0"
      inkscape:showpageshadow="true"
      showborder="true"
      borderlayer="true"
@@ -112,7 +112,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
