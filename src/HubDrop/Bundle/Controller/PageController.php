@@ -13,7 +13,7 @@ class PageController extends Controller
   public function aboutAction()
   {
     $content = <<<HTML
-<h2 class="text-center">About</h2>
+    <div class='row'>
 <div class='col-sm-6'>
 <p>
   <a href='http://hubdrop.io'>HubDrop.io</a> provides mirroring of <a href='http://hubdrop.io'>drupal.org</a> projects on <a href='http://github.com'>GitHub</a> as a free public service.
@@ -30,6 +30,8 @@ class PageController extends Controller
   Plans for the future include allowing projects to move to GitHub as the primary repo, with mirroring or releases being sent back to drupal.org.
 </p>
 </div>
+</div>
+<div class='row'>
 <div class='col-sm-12 text-center text-muted'>
 <p>
   HubDrop.io is brought to you by <a href='http://thinkdrop.net'>THINKDROP</a>.
