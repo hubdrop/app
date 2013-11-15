@@ -131,7 +131,7 @@ class HubDropController extends Controller
     $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
 
     try {
-      $repo = $client->api('repo')->create($project_name, 'Mirror of drupal.org provided by hubdrop.io', 'http://drupal.org/project/' . $project_name, true, $this->github_org);
+      $repo = $client->api('repo')->create($project_name, "Mirror of http://drupal.org/project/$project_name provided by hubdrop. See http://hubdrop.io/project/$project_name for more info.", true, $this->github_org);
       $output = "GitHub Repo created at " . $repo['html_url'];
     }
     catch (\Github\Exception\ValidationFailedException $e) {
