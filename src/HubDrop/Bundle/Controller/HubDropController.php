@@ -11,7 +11,7 @@ use Github\Client as GithubClient;
 class HubDropController extends Controller
 {
   private $repo_path = '/var/hubdrop/repos';
-  private $github_org = 'drupal-project';
+  private $github_org = 'drupalrojects';
   private $jenkins_url = 'http://hubdrop:8080';
 
   /**
@@ -131,7 +131,7 @@ class HubDropController extends Controller
     $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
 
     try {
-      $repo = $client->api('repo')->create($project_name, "Mirror of http://drupal.org/project/$project_name provided by hubdrop. See http://hubdrop.io/project/$project_name for more info.", true, $this->github_org);
+      $repo = $client->api('repo')->create($project_name, "Mirror of http://drupal.org/project/$project_name provided by hubdrop.", "http://hubdrop.io", true, $this->github_org);
       $output = "GitHub Repo created at " . $repo['html_url'];
     }
     catch (\Github\Exception\ValidationFailedException $e) {
@@ -149,8 +149,9 @@ class HubDropController extends Controller
     if (!$stop_process) {
       $output = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $project_name);
     }
-
+    print $output;
+    die;
     //return new Response($output);
-    return $this->redirect('/project/' . $project_name);
+    //return $this->redirect('/project/' . $project_name);
   }
 }
