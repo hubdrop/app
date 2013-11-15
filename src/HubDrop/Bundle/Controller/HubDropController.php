@@ -11,7 +11,7 @@ use Github\Client as GithubClient;
 class HubDropController extends Controller
 {
   private $repo_path = '/var/hubdrop/repos';
-  private $github_org = 'drupal-projects';
+  private $github_org = 'drupal-project';
   private $jenkins_url = 'http://hubdrop:8080';
 
   /**
