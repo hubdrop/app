@@ -31,7 +31,7 @@ class MirrorCommand extends Command
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $project_name = $input->getArgument('name');
-    if ($name) {
+    if ($project_name) {
       $text = 'Cloning ' . $project_name;
     } else {
       $text = 'No Project!';
