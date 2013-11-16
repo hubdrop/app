@@ -20,7 +20,8 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
         "guzzle/guzzle": "~3.7",
-        "knplabs/github-api": "*"
+        "knplabs/github-api": "*",
+        "symfony/console": "*"
     },
     "scripts": {
         "post-install-cmd": [
