@@ -21,7 +21,8 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "guzzle/guzzle": "~3.7",
         "knplabs/github-api": "*",
-        "symfony/console": "*"
+        "symfony/console": "*",
+        "symfony/dependency-injection": "*"
     },
     "scripts": {
         "post-install-cmd": [

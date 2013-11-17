@@ -12,13 +12,13 @@ class Project {
   // The drupal project we want to deal with.
   public $name;
 
-    public $drupal_http_url;
-    public $drupal_git_url;
+public $drupal_http_url;
+public $drupal_git_url;
 
-    public $github_http_url;
-    public $github_git_url;
+public $github_http_url;
+public $github_git_url;
 
-    public $local_clone_path;
+public $local_clone_path;
 
   /**
    * Initiate the project
@@ -32,7 +32,7 @@ class Project {
 
     $this->github_http_url = "http://github.com/drupalprojects/$name";
     $this->github_git_ssh_url = "git@github.com:drupalprojects/$name";
-    $this->github_git_http_url = "git@github.com:drupalprojects/$name";
+    $this->github_git_http_url = "http://github.com/drupalprojects/$name";
 
     $this->local_clone_path = "/var/hubdrop/repos/$name.git";
 

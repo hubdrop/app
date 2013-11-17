@@ -41,6 +41,11 @@ class MirrorCommand extends Command
     //    $text = strtoupper($text);
     //}
 
+     // ...
+
+    $hubdrop = $this->get('hubdrop');
+    $hubdrop->mirror('views');
+
     $output->writeln($text);
   }
 }

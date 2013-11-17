@@ -3,8 +3,6 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
 use Github\Client as GithubClient;
 
@@ -42,21 +40,24 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
-    $project = $this->get('hubdrop_project');
-    $newsletter = new ProjectManager($mailer);
+      //$mailer = $this->get('my_mailer');
 
-    print_r($hubdrop);
-    die;
+      // Loading a project
+      $project = $this->get('hubdrop')->getProject($project_name);
 
-    // Default twig variables
+      // Ideal?
+      //$project = $this->get('hubdrop')->project->get($project_name);
+
+
+      // Default twig variables
     $params = array();
     $params['project_cloned'] = FALSE;    // Cloned Locally
     $params['project_mirrored'] = FALSE;  // On GitHub
     $params['project_exists'] = FALSE;    // On drupal.org
     $params['message'] = '';
 
-    $params['github_web_url'] = 'http://github.com/' . $this->github_org . '/' . $project_name;
-    $params['local_clone_path'] = $this->repo_path . '/' . $project_name . '.git';
+    $params['github_web_url'] = $project->github_http_url;
+    $params['local_clone_path'] = $project->local_clone_path;
 
     // @TODO: Figure out how to cache this, or rig it up so it is faster.
 
@@ -114,7 +115,7 @@ class HubDropController extends Controller
 
     // Build template params
     $params['project_name'] = $project_name;
-    $params['project_drupal_url'] = "http://drupal.org/project/$project_name";
+    $params['project_drupal_url'] = $project->drupal_http_url;
 
     if ($params['project_exists']){
       $params['project_drupal_git'] = "http://git.drupal.org/project/$project_name.git";
