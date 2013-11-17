@@ -1,0 +1,8 @@
+services:
+  hubdrop:
+    class:        "%hubdrop.class%"
+    arguments:    ["%hubdrop.project%"]
+    
+parameters:
+  hubdrop.class:      HubDrop\Bundle\HubDrop
+  hubdrop.project:  hubdrop_test
