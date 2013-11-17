@@ -11,7 +11,7 @@ use Github\Client as GithubClient;
 class HubDropController extends Controller
 {
   private $repo_path = '/var/hubdrop/repos';
-  private $github_org = 'drupalrojects';
+  private $github_org = 'drupalprojects';
   private $jenkins_url = 'http://hubdrop:8080';
 
   /**
@@ -25,7 +25,6 @@ class HubDropController extends Controller
    */
   public function homeAction()
   {
-    //
     $project_name = $this->get('request')->query->get('project_name');
     if ($project_name){
       return $this->redirect($this->generateUrl('_project', array(
@@ -43,6 +42,11 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
+    $project = $this->get('hubdrop_project');
+    $newsletter = new ProjectManager($mailer);
+
+    print_r($hubdrop);
+    die;
 
     // Default twig variables
     $params = array();

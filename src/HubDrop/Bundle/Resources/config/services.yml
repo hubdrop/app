@@ -1,8 +1,15 @@
 services:
-  hubdrop:
-    class:        "%hubdrop.class%"
-    arguments:    ["%hubdrop.project%"]
+  hubdrop_project:
+    class:        "%hubdrop_project.class%"
+    arguments:    ["%hubdrop_project.name%"]
+    
+    
+  hubdrop_project_manager:
+    class:        "%hubdrop_project_manager.class%"
+    calls:
+            - [setProject, ["@hubdrop_project"]]
     
 parameters:
-  hubdrop.class:      HubDrop\Bundle\HubDrop
-  hubdrop.project:  hubdrop_test
+  hubdrop_project.class:      HubDrop\Bundle\Project\HubDropProject
+  hubdrop_project.name:  hubdrop_test
+  hubdrop_project_manager.class: HubDrop\Bundle\Project\HubDropProjectManager
