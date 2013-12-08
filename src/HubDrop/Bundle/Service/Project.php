@@ -18,12 +18,16 @@ class Project {
   // All of the pertinant urls for this project, including local ones.
   public $urls;
 
+  // Some easy access booleans
+  public $drupal_project_exists = FALSE;
+  public $github_project_exists = FALSE;
+
   /**
    * Initiate the project
    */
-  public function __construct($name) {
+  public function __construct($name, $check = FALSE) {
+    // Set properties
     $this->name = $name;
-
     $this->urls = array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/$name",
@@ -40,6 +44,14 @@ class Project {
         'file' => "/var/hubdrop/repos/$name.git",
       ),
     );
+
+    // If $check, lookup if the projects exist.
+    if ($check){
+      $this->drupal_project_exists = (bool) $this->checkUrl();
+      $this->github_project_exists = $this->drupal_project_exists?
+        (bool) $this->checkUrl('github'):
+        FALSE;
+    }
   }
 
   /**

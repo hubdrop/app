@@ -44,16 +44,16 @@ class HubDropController extends Controller
     }
 
     // Get Project object.
-    $project = $this->get('hubdrop')->getProject($project_name);
+    $project = $this->get('hubdrop')->getProject($project_name, TRUE);
 
     $params = array();
     $params['project_name'] = $project_name;
-    $params['project_exists'] = $project->checkUrl('drupal', 'web');    // On drupal.org
+    $params['project_exists'] = $project->drupal_project_exists;    // On drupal.org
     $params['urls'] = $project->urls;
 
     if ($params['project_exists']){
       $params['project_cloned'] = $project->checkUrl('local', 'file');    // Cloned Locally
-      $params['project_mirrored'] = $project->checkUrl('github', 'web');  // On GitHub
+      $params['project_mirrored'] = $project->github_project_exists;  // On GitHub
       $params['message'] = '';
 
       $params['urls'] = $project->urls;
