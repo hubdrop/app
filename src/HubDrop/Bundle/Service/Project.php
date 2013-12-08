@@ -6,19 +6,17 @@
  * Put as much logic in here as possible
  */
 namespace HubDrop\Bundle\Service;
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\BadResponseException;
+
 
 class Project {
 
   // The drupal project we want to deal with.
   public $name;
 
-public $drupal_http_url;
-public $drupal_git_url;
-
-public $github_http_url;
-public $github_git_url;
-
-public $local_clone_path;
+  // An array of urls
+  public  $urls;
 
   /**
    * Initiate the project
@@ -26,16 +24,60 @@ public $local_clone_path;
   public function __construct($name) {
     $this->name = $name;
 
-    $this->drupal_http_url = "http://drupal.org/project/$name";
-    $this->drupal_git_ssh_url = "hubdrop@git.drupal.org/project/$name";
-    $this->drupal_git_http_url = "http://git.drupal.org/project/$name.git";
+    $this->urls = array(
+      'drupal' => array(
+        'web' =>  "http://drupal.org/project/$name",
+        'ssh' => "hubdrop@git.drupal.org/project/$name",
+        'http' => "http://git.drupal.org/project/$name.git",
+      ),
+      'github' => array(
+        'web' => "http://github.com/drupalprojects/$name",
+        'ssh' => "git@github.com:drupalprojects/$name",
+        'http' =>  "http://git.drupal.org/project/$name.git",
+      ),
+      'localhost' => array(
+      // @TODO: Un-hardcode path?
+        'file' => "/var/hubdrop/repos/$name.git",
+      ),
+    );
+  }
 
-    $this->github_http_url = "http://github.com/drupalprojects/$name";
-    $this->github_git_ssh_url = "git@github.com:drupalprojects/$name";
-    $this->github_git_http_url = "http://github.com/drupalprojects/$name";
+  /**
+   * Initiate the project
+   */
+  public function getUrl($remote, $type = 'web') {
+    if (isset($this->urls[$remote]) && isset($this->urls[$remote][$type])){
+      return $this->urls[$remote][$type];
+    }
+    else {
+      // @TODO: Exceptions, anyone?
 
-    $this->local_clone_path = "/var/hubdrop/repos/$name.git";
+    }
+  }
 
+  /**
+   * Check a URL's existence.
+   *
+   * @param string $remote
+   *   Can be 'drupal', 'github', 'local'
+   *
+   * @param string $type
+   *   Can be 'web' for the project's website, 'ssh' for the ssh clone url, or
+   *   'http' for the http clone url.  'file' for local filepath.
+   *
+   * @return bool|\Guzzle\Http\Message\Response
+   */
+  public function checkUrl($remote = 'drupal', $type = 'web'){
+    $client = new Client();
+    $url = $this->getUrl($remote, $type);
+
+    // Check the HTTP response with Guzzle.
+    try {
+      $response = $client->get($url)->send();
+      return $response;
+    } catch (BadResponseException $e) {
+      return FALSE;
+    }
   }
 }
 
