@@ -61,8 +61,8 @@ class HubDropController extends Controller
     }
 
     // Stopgap
-    $params['message'] = 'This branch is in development.  Mirroring is temporarily disabled.';
-    $params['allow_mirroring'] = FALSE;
+//    $params['message'] = 'This branch is in development.  Mirroring is temporarily disabled.';
+    $params['allow_mirroring'] = TRUE;
 
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
   }
@@ -72,33 +72,7 @@ class HubDropController extends Controller
    */
   private function mirrorProject($project_name)
   {
-//    $stop_process = FALSE;
-//
-//    // Connect to GitHub and create a Repo for $project_name
-//    // From https://github.com/KnpLabs/php-github-api/blob/master/doc/repos.md
-//    $client = new GithubClient();
-//    $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
-//
-//    try {
-//      $repo = $client->api('repo')->create($project_name, "Mirror of http://drupal.org/project/$project_name provided by hubdrop.", "http://hubdrop.io", true, $this->github_org);
-//      $output = "GitHub Repo created at " . $repo['html_url'];
-//    }
-//    catch (\Github\Exception\ValidationFailedException $e) {
-//      // For now we assume this is just a
-//      // "Validation Failed: name already exists on this account
-//      if ($e->getCode() == 422){
-//        $output = '<p>Repo already exists on github: http://github.com/' . $this->github_org . '/' . $project_name . '</p>';
-//      }
-//      else {
-//        $output = $e->getMessage();
-//        $stop_process = TRUE;
-//      }
-//    }
-//
-//    if (!$stop_process) {
-//      $output = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $project_name);
-//    }
-//    //return new Response($output);
-//    return $this->redirect('/project/' . $project_name);
+    $this->get('hubdrop')->createGitHubRepo($project_name);
+    return $this->redirect('/project/' . $project_name);
   }
 }
