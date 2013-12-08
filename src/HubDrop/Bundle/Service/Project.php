@@ -15,8 +15,8 @@ class Project {
   // The drupal project we want to deal with.
   public $name;
 
-  // An array of urls
-  public  $urls;
+  // All of the pertinant urls for this project, including local ones.
+  public $urls;
 
   /**
    * Initiate the project
@@ -43,7 +43,7 @@ class Project {
   }
 
   /**
-   * Initiate the project
+   * Return a specific URL
    */
   public function getUrl($remote, $type = 'web') {
     if (isset($this->urls[$remote]) && isset($this->urls[$remote][$type])){
@@ -51,7 +51,6 @@ class Project {
     }
     else {
       // @TODO: Exceptions, anyone?
-
     }
   }
 
