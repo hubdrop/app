@@ -9,6 +9,9 @@ namespace HubDrop\Bundle\Service;
 
 use HubDrop\Bundle\Service\Project;
 
+use Guzzle\Http\Client;
+use Github\Client as GithubClient;
+
 class HubDrop {
 
   public $hubdrop_url = 'http://hubdrop.io';
@@ -45,24 +48,21 @@ class HubDrop {
     $client = new GithubClient();
     $client->authenticate($this->github_application_token, '', \Github\Client::AUTH_URL_TOKEN);
 
+    $project = new Project($name);
 
     try {
-      $repo = $client->api('repo')->create($name, "Mirror of $project->drupal_http_url provided by hubdrop.", $this->hubdrop_url, true, $this->github_organization);
 
-      $this->github_repo = $repo;
-      return $project;
+      // Create the Repo on GitHub (this can be run by www-data, or any user.)
+      $url = $project->getUrl('drupal');
+      $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->hubdrop_url, true, $this->github_organization);
+
+      // Fire the Jenkins build for cloning the mirror locally.
+      // (Since we are cloning files we need to run this as the hubdrop user.
+      $repo['hubdrop_jenkins_output'] = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $name);
+      return $repo;
     }
-    catch (\Github\Exception\ValidationFailedException $e) {
-      // For now we assume this is just a
-      // "Validation Failed: name already exists on this account
-      if ($e->getCode() == 422){
-        //$output = '<p>Repo already exists on github: http://github.com/' . $this->github_org . '/' . $project_name . '</p>';
-
-        return FALSE;
-      }
-      else {
-        return FALSE;
-      }
+    catch (ValidationFailedException $e) {
+      return FALSE;
     }
   }
 }

@@ -54,15 +54,15 @@ class StatusCommand extends ContainerAwareCommand
       if (isset($urls['web'])){
         $web = $urls['web'];
         if ($project->checkUrl($remote)){
-          $out[] = "[SUCCESS] $remote site exists at $web";
+          $out[] = "<info>[FOUND]</info> $remote site exists at $web";
         }
         else {
-          $out[] = "[FAIL] $remote site not found at $web";
+          $out[] = "<comment>[NOT FOUND]</comment> $remote site not found at $web";
         }
       }
     }
 
-    // @TODO: Setup proper exist code stuff.
+    // @TODO: Setup proper exit code stuff.
     $output->writeln($out);
   }
 }
