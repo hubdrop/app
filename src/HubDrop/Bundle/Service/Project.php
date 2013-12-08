@@ -5,7 +5,7 @@
  *
  * Put as much logic in here as possible
  */
-namespace HubDrop\Bundle\Project;
+namespace HubDrop\Bundle\Service;
 
 class Project {
 
