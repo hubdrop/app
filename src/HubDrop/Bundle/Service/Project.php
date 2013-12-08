@@ -67,15 +67,20 @@ class Project {
    * @return bool|\Guzzle\Http\Message\Response
    */
   public function checkUrl($remote = 'drupal', $type = 'web'){
-    $client = new Client();
-    $url = $this->getUrl($remote, $type);
+    if ($remote == 'local' && $type == 'file'){
+      return file_exists($this->getUrl($remote, $type));
+    }
+    else {
+      $client = new Client();
+      $url = $this->getUrl($remote, $type);
 
-    // Check the HTTP response with Guzzle.
-    try {
-      $response = $client->get($url)->send();
-      return $response;
-    } catch (BadResponseException $e) {
-      return FALSE;
+      // Check the HTTP response with Guzzle.
+      try {
+        $response = $client->get($url)->send()->getReasonPhrase();
+        return TRUE;
+      } catch (BadResponseException $e) {
+        return FALSE;
+      }
     }
   }
 }
