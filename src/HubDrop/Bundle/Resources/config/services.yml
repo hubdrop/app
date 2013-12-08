@@ -1,6 +1,9 @@
 parameters:
   hubdrop.class:  HubDrop\Bundle\Service\HubDrop
+  hubdrop.github_organization: 'drupalprojects'
+  hubdrop.drupal_username: 'hubdrop'
 
 services:
   hubdrop:
     class:        "%hubdrop.class%"
+    arguments: ["%hubdrop.github_organization%", "%hubdrop.drupal_username%"]
