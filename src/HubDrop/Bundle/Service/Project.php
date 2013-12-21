@@ -51,13 +51,13 @@ class Project {
     $this->urls = array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/$name",
-        'ssh' => "hubdrop@git.drupal.org/project/$name",
+        'ssh' => "hubdrop@git.drupal.org:project/$name.git",
         'http' => "http://git.drupal.org/project/$name.git",
       ),
       'github' => array(
         'web' => "http://github.com/drupalprojects/$name",
-        'ssh' => "git@github.com:drupalprojects/$name",
-        'http' =>  "http://git.drupal.org/project/$name.git",
+        'ssh' => "git@github.com:drupalprojects/$name.git",
+        'http' =>  "https://github.com/project/$name.git",
       ),
       'hubdrop' => array(
         'web' => "http://hubdrop.io/project/$name",
