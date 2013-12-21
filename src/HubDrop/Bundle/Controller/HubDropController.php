@@ -35,32 +35,38 @@ class HubDropController extends Controller
     // @TODO: Break out into its own route. Require a POST? Symfony Form API?
     // Mirror: GO!
     // We only want to try to mirror a project if not yet cloned and it exists.
-    if ($this->get('request')->query->get('mirror') == 'go'){
-      $this->get('hubdrop')->initMirror($project_name);
+
+    // Get Project object
+    $project = $this->get('hubdrop')->getProject($project_name);
+
+    // If ?mirror=go
+    if ($project->mirrored == FALSE && $this->get('request')->query->get('mirror') == 'go'){
+      $project->initMirror();
       return $this->redirect('/project/' . $project_name);
     }
 
-    // Get Project object (with checks)
-    $project = $this->get('hubdrop')->getProject($project_name, TRUE);
+    // Build twig vars
+    $vars = array();
+    $vars['project'] = $project;
 
-    $params = array();
-    $params['project_name'] = $project_name;
-    $params['project_exists'] = $project->exists;    // On drupal.org
-    $params['urls'] = $project->urls;
+    // @TODO: Just use project in twig templates
+    $vars['project_name'] = $project_name;
+    $vars['project_exists'] = $project->exists;    // On drupal.org
+    $vars['urls'] = $project->urls;
 
-    if ($params['project_exists']){
-      $params['project_cloned'] = $project->cloned;    // Cloned Locally
-      $params['project_mirrored'] = $project->mirrored;  // On GitHub
-      $params['message'] = '';
+    if ($vars['project_exists']){
+      $vars['project_cloned'] = $project->cloned;    // Cloned Locally
+      $vars['project_mirrored'] = $project->mirrored;  // On GitHub
+      $vars['message'] = '';
 
-      $params['urls'] = $project->urls;
-      $params['project_drupal_git'] = $project->getUrl('drupal');
+      $vars['urls'] = $project->urls;
+      $vars['project_drupal_git'] = $project->getUrl('drupal');
     }
 
     // Stopgap
 //    $params['message'] = 'This branch is in development.  Mirroring is temporarily disabled.';
-    $params['allow_mirroring'] = TRUE;
+    $vars['allow_mirroring'] = TRUE;
 
-    return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
+    return $this->render('HubDropBundle:HubDrop:project.html.twig', $vars);
   }
 }
