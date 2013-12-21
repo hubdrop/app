@@ -19,13 +19,21 @@ class Project {
   // All of the pertinent urls for this project, including local ones.
   public $urls;
 
-  // Some easy access booleans
+  // Whether or not the Drupal project exists
+  public $exists = FALSE;
+
+  // Whether or not the Drupal project has a mirror on GitHub
+  public $mirrored = FALSE;
+
+  // Whether or not the Drupal project is cloned locally.
+  public $cloned = FALSE;
+
+  // @TODO: Remove.
+  public $clone_exists = FALSE;
   public $drupal_project_exists = FALSE;
   public $github_project_exists = FALSE;
 
-  // GitHub API Repo object
-  public $github_repo;
-
+  // @TODO: Move to HubDrop service and use config.yml to store default.
   // These are really a part of the larger HubDrop service, but I
   // haven't learned how to access that from a Project class yet!
   public $github_organization = 'drupalprojects';
@@ -40,11 +48,10 @@ class Project {
    */
   private $github_application_token = '2f3a787bc2881ac86d0277b37c1b9a67c4c509bb';
 
-
   /**
    * Initiate the project
    */
-  public function __construct($name, $check = FALSE) {
+  public function __construct($name) {
     // Set properties
     // @TODO: Un-hardcode these properties.
     $this->name = $name;
@@ -67,10 +74,24 @@ class Project {
       ),
     );
 
-    // If $check, lookup if the projects exist.
-    if ($check){
-      $this->drupal_project_exists = (bool) $this->checkUrl();
-      $this->github_project_exists = $this->drupal_project_exists?
+    // Check if the project has been cloned (and therefor, exists)
+    $this->cloned = (bool) $this->checkUrl('localhost');
+
+    // If it is cloned locally...
+    if ($this->cloned){
+      // We can assume the Drupal project exists.
+      $this->exists = TRUE;
+
+      // We will assume the clone is mirrored (until we can't).
+      $this->mirrored = TRUE;
+    }
+    // If it is not cloned locally...
+    else {
+      // Check to see if it exists
+      $this->exists = (bool) $this->checkUrl('drupal');
+
+      // If it does, check to see if it is mirrored yet.
+      $this->mirrored = $this->exists?
         (bool) $this->checkUrl('github'):
         FALSE;
     }
@@ -101,7 +122,7 @@ class Project {
    * @return bool|\Guzzle\Http\Message\Response
    */
   public function checkUrl($remote = 'drupal', $type = 'web'){
-    if ($remote == 'localhost' && $type == 'path'){
+    if ($remote == 'localhost'){
       return file_exists($this->getUrl($remote, $type));
     }
     else {
@@ -128,18 +149,18 @@ class Project {
   public function mirror(){
 
     // If there is no drupal project, we can't mirror.
-    $drupal_exists = $this->checkUrl();
-    if (!$drupal_exists){
+    if ($this->exists == FALSE){
       throw new NoProjectException('Not a Drupal project.');
     }
 
     // Create the GitHub Repo (if it doesn't exist)
-    if (!$this->checkUrl('github')){
+    // No exception because we want it to keep going.
+    if ($this->mirrored == FALSE){
       $this->createRemote();
     }
 
     // Clone the Drupal Repo (if it doesn't exist)
-    if (!$this->checkUrl('localhost', 'path')){
+    if ($this->cloned == FALSE){
       $this->cloneDrupal();
     }
 

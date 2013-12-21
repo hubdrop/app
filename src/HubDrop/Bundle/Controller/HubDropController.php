@@ -45,16 +45,16 @@ class HubDropController extends Controller
 
     $params = array();
     $params['project_name'] = $project_name;
-    $params['project_exists'] = $project->drupal_project_exists;    // On drupal.org
+    $params['project_exists'] = $project->exists;    // On drupal.org
     $params['urls'] = $project->urls;
 
     if ($params['project_exists']){
-      $params['project_cloned'] = $project->checkUrl('localhost');    // Cloned Locally
-      $params['project_mirrored'] = $project->github_project_exists;  // On GitHub
+      $params['project_cloned'] = $project->cloned;    // Cloned Locally
+      $params['project_mirrored'] = $project->mirrored;  // On GitHub
       $params['message'] = '';
 
       $params['urls'] = $project->urls;
-      $params['project_drupal_git'] = $project->getUrl('drupal', 'web');
+      $params['project_drupal_git'] = $project->getUrl('drupal');
     }
 
     // Stopgap

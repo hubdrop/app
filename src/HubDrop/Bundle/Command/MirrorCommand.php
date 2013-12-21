@@ -52,6 +52,7 @@ class MirrorCommand extends ContainerAwareCommand
     $project->mirror();
 
     // Output a message.
+    // @TODO: Improve logging.
     $out[] = "<info>[SUCCESS]</info> Mirror successfully created!";
     $output->writeln($out);
   }
