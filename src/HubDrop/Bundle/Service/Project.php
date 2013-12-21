@@ -135,16 +135,38 @@ class Project {
 
     // Create the GitHub Repo (if it doesn't exist)
     if (!$this->checkUrl('github')){
-      $this->createRemote($this->name);
+      $this->createRemote();
     }
 
     // Clone the Drupal Repo (if it doesn't exist)
     if (!$this->checkUrl('localhost', 'path')){
-      $this->cloneDrupal($this->name);
+      $this->cloneDrupal();
     }
 
     // Pull & Push
-    $this->update($this->name);
+    $this->update();
+  }
+
+  /**
+   * Pulls & Pushes the Project Repo.
+   */
+  public function update(){
+
+    // Check if local clone exists
+    if (!$this->checkUrl("localhost", "path")){
+      throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
+    }
+
+    $cmds = array();
+    $cmds[] = "git fetch -p origin";
+    $cmds[] = "git push --mirror";
+
+    // @TODO: Throw an exception if something fails.
+    chdir($this->getUrl('localhost', 'path'));
+    foreach ($cmds as $cmd){
+      print $cmd . "\n";
+      exec($cmd);
+    }
   }
 
   /**
@@ -167,7 +189,6 @@ class Project {
       return FALSE;
     }
   }
-
   /**
    * $project->cloneDrupal()
    * Runs git clone
@@ -202,23 +223,8 @@ class Project {
       exec($cmd);
     }
   }
-
-  /**
-   * Pulls & Pushes the Project Repo.
-   */
-  private function update(){
-    $cmds = array();
-    $cmds[] = "git fetch -p origin";
-    $cmds[] = "git push --mirror";
-
-    // @TODO: Throw an exception if something fails.
-    chdir($this->getUrl('localhost', 'path'));
-    foreach ($cmds as $cmd){
-      print $cmd . "\n";
-      exec($cmd);
-    }
-  }
 }
 
 
 class NoProjectException extends \Exception { }
+class NotClonedException extends \Exception { }
