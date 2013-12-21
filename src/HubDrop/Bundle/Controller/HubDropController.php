@@ -8,10 +8,6 @@ use Github\Client as GithubClient;
 
 class HubDropController extends Controller
 {
-  private $repo_path = '/var/hubdrop/repos';
-  private $github_org = 'drupalprojects';
-  private $jenkins_url = 'http://hubdrop:8080';
-
 
   /**
    * Route: Homepage
@@ -40,10 +36,11 @@ class HubDropController extends Controller
     // Mirror: GO!
     // We only want to try to mirror a project if not yet cloned and it exists.
     if ($this->get('request')->query->get('mirror') == 'go'){
-      return $this->mirrorProject($project_name);
+      $this->get('hubdrop')->initMirror($project_name);
+      return $this->redirect('/project/' . $project_name);
     }
 
-    // Get Project object.
+    // Get Project object (with checks)
     $project = $this->get('hubdrop')->getProject($project_name, TRUE);
 
     $params = array();
@@ -65,14 +62,5 @@ class HubDropController extends Controller
     $params['allow_mirroring'] = TRUE;
 
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $params);
-  }
-
-  /**
-   * Mirror a Project.
-   */
-  private function mirrorProject($project_name)
-  {
-    $this->get('hubdrop')->createGitHubRepo($project_name);
-    return $this->redirect('/project/' . $project_name);
   }
 }

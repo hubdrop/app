@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file MirrorCommand.php
+ * The mirror command simply
+ */
+
+
 namespace HubDrop\Bundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -39,34 +45,14 @@ class MirrorCommand extends ContainerAwareCommand
     // Get command argument.
     $project_name = $input->getArgument('name');
 
-    // Get Project object (with check.
-    $project = $hubdrop->getProject($project_name, TRUE);
+    // Get Project object
+    $project = $hubdrop->getProject($project_name);
 
-    // Check if project already exists
-    if ($project->github_project_exists){
-      $output->writeln("<comment>[ERROR]</comment> GitHub project already exists: " . $project->getUrl('github'));
-      return;
-    }
-    // check if there is no drupal project
-    elseif (!$project->drupal_project_exists) {
-      $output->writeln("<info>[ERROR]</info> Drupal.org project does not exist: " . $project->getUrl('drupal'));
-      return;
-    }
-    // If there is a drupal project, we are ready to go.
-    else {
-      $out[] = '<info>[OK]</info> Preparing to mirror ' . $project->getUrl('drupal', 'http');
-      $output->writeln($out); $out = array();
+    // Mirror that sucker.
+    $project->mirror();
 
-      // Create the GitHub Repo
-      $repo = $hubdrop->createGitHubRepo($project_name);
-
-      if ($repo['html_url']){
-        $out[] = '<info>[OK]</info> GitHub Repo created! ' . $project->getUrl('github', 'web');
-      }
-      else {
-        $out[] = '<warning>[ERROR]</warning>[> Something went wrong. GitHub Repo not created.';
-      }
-      $output->writeln($out);
-    }
+    // Output a message.
+    $out[] = "<info>[SUCCESS]</info> Mirror successfully created!";
+    $output->writeln($out);
   }
 }
