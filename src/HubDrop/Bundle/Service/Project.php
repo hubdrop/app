@@ -170,6 +170,25 @@ class Project {
   }
 
   /**
+   * Pulls & Pushes the Project Repo.
+   */
+  public function setSource($source){
+    $cmds = array();
+    chdir($this->getUrl('localhost', 'path'));
+    if ($source == 'github'){
+      $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
+      $cmds[] = "git remote set-url origin " . $this->getUrl('github', 'ssh');
+    }
+    elseif ($source == 'drupal') {
+      $cmds[] = "git remote set-url --push origin " . $this->getUrl('github', 'ssh');
+      $cmds[] = "git remote set-url origin " . $this->getUrl('drupal', 'http');
+    }
+    foreach ($cmds as $cmd){
+      exec($cmd);
+    }
+  }
+
+  /**
    * Create the GitHub repository.
    */
   private function createRemote(){
@@ -200,7 +219,6 @@ class Project {
 
     // Clone the repo
     $cmd = "git clone $drupal_remote $target_path --mirror";
-    print $cmd . "\n";
     exec($cmd);
 
     // Set fetch configs to ignore github pull requests
@@ -219,7 +237,6 @@ class Project {
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
-      print $cmd . "\n";
       exec($cmd);
     }
   }

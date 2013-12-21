@@ -18,7 +18,7 @@ class HubDrop {
   */
   public $hubdrop_url = 'http://hubdrop.io';
   public $github_organization = 'drupalprojects';
-  private $repo_path = '/var/hubdrop/repos';
+  public $repo_path = '/var/hubdrop/repos';
   private $jenkins_url = 'http://hubdrop:8080';
 
   public $github_client;  // GithubClient object
