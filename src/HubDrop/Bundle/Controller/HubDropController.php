@@ -49,7 +49,7 @@ class HubDropController extends Controller
     $params['urls'] = $project->urls;
 
     if ($params['project_exists']){
-      $params['project_cloned'] = $project->checkUrl('local', 'file');    // Cloned Locally
+      $params['project_cloned'] = $project->checkUrl('localhost');    // Cloned Locally
       $params['project_mirrored'] = $project->github_project_exists;  // On GitHub
       $params['message'] = '';
 
