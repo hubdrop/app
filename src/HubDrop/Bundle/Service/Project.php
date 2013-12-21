@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Our Service
+ * class Project
  *
- * Put as much logic in here as possible
+ * Represents a Drupal project that is being mirrored by HubDrop.
+ *
  */
 namespace HubDrop\Bundle\Service;
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
-use Symfony\Component\Debug\ExceptionHandler;
 use Github\Client as GithubClient;
 
 class Project {
@@ -28,17 +28,10 @@ class Project {
   // Whether or not the Drupal project is cloned locally.
   public $cloned = FALSE;
 
-  // @TODO: Remove.
-  public $clone_exists = FALSE;
-  public $drupal_project_exists = FALSE;
-  public $github_project_exists = FALSE;
-
   // @TODO: Move to HubDrop service and use config.yml to store default.
   // These are really a part of the larger HubDrop service, but I
   // haven't learned how to access that from a Project class yet!
-  public $github_organization = 'drupalprojects';
-  private $local_path = '/var/hubdrop/repos';
-  private $jenkins_url = 'http://hubdrop:8080';
+  private $github_organization = 'drupalprojects';
 
   /**
    * This was retrieved using a github username and password with curl:
@@ -140,11 +133,29 @@ class Project {
   }
 
   /**
-   * Project->mirror()
-   * The creation process for a hubdrop mirror.
+   * Queues the creation of a HubDrop Mirror.  This command should return as
+   * quickly as possible. It simply tells Jenkins to run a job.
    *
-   * This function can take a long time, so it is typically run by a
-   * jenkins job, or from the command line.
+   * This only works in a HubDrop Vagrant / Chef provisioned server
+   */
+  public function initMirror(){
+    // @TODO: Handle errors and send flash message to user.
+    exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $this->name);
+  }
+
+  /**
+   * $project->mirror()
+   * The actual creation process for a hubdrop mirror.
+   *
+   * This function can take a long time, so it is typically run from the
+   * command line (manually or via a jenkins job).
+   *
+   * 1. Creates a Github repo of the same name (if needed).
+   * 2. Clones the drupal.org project locally (if needed).
+   * 3. Updates (pulls & pushes) the project.
+   *
+   * @see MirrorCommand.php
+   *
    */
   public function mirror(){
 
