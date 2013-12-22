@@ -11,6 +11,8 @@ use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
 use Github\Client as GithubClient;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class Project {
 
   // The drupal project we want to deal with.
@@ -28,7 +30,7 @@ class Project {
   // Whether or not the Drupal project is cloned locally.
   public $cloned = FALSE;
 
-  // @TODO: Move to HubDrop service and use config.yml to store default.
+  // @TODO: Move to HubDrop service and use service parameters to store default.
   // These are really a part of the larger HubDrop service, but I
   // haven't learned how to access that from a Project class yet!
   private $github_organization = 'drupalprojects';
@@ -139,8 +141,14 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initMirror(){
+    // if in a dev environment, send a flash message with the command to run.
+    $session = new Session();
+
+    // set flash messages
+    $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
+
     // @TODO: Handle errors and send flash message to user.
-    exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $this->name);
+    $output = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $this->name);
   }
 
   /**
@@ -185,7 +193,7 @@ class Project {
   public function update(){
 
     // Check if local clone exists
-    if (!$this->checkUrl("localhost", "path")){
+    if (!$this->checkUrl("localhost")){
       throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
     }
 

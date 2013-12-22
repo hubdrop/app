@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Guzzle\Http\Client;
 use Github\Client as GithubClient;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
+
 class HubDropController extends Controller
 {
 
@@ -31,6 +34,8 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
+    $session = new Session();
+    $session->start();
 
     // @TODO: Break out into its own route. Require a POST? Symfony Form API?
     // Mirror: GO!

@@ -39,11 +39,13 @@
     </div>
     <div id="content">
       {% block body %}
+          <div class="alert alert-success">
           {% for flashMessage in app.session.flashbag.get('notice') %}
-              <div class="flash-message">
-                  <em>Notice</em>: {{ flashMessage }}
-              </div>
+              <p>
+                {{ flashMessage }}
+              </p>
           {% endfor %}
+          </div>
 
           <div class="block">
               {% block content %}{% endblock %}
