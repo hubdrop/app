@@ -118,7 +118,7 @@ class Project {
    */
   public function checkUrl($remote = 'drupal', $type = 'web'){
     if ($remote == 'localhost'){
-      return file_exists($this->getUrl($remote, $type));
+      return file_exists($this->getUrl($remote, 'path'));
     }
     else {
       $client = new Client();
@@ -193,7 +193,7 @@ class Project {
   public function update(){
 
     // Check if local clone exists
-    if (!$this->checkUrl("localhost")){
+    if ($this->checkUrl("localhost") == FALSE){
       throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
     }
 
