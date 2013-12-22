@@ -34,8 +34,6 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
-    $session = new Session();
-    $session->start();
 
     // @TODO: Break out into its own route. Require a POST? Symfony Form API?
     // Mirror: GO!
