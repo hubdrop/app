@@ -279,6 +279,39 @@ class Project {
     foreach ($cmds as $cmd){
       exec($cmd);
     }
+
+    $this->cloned = TRUE;
+  }
+
+  /**
+   * Quickly checks if a user is a maintainer of a module.
+   * @param $username
+   * @param $password
+   */
+  public function checkMaintainership($username, $password){
+    $name = $this->name;
+
+    // Throw exception if we haven't cloned it yet.
+    if ($this->cloned == FALSE){
+      throw new NotClonedException("THIS project hasn't been cloned yet.");
+    }
+
+    $cmds = array();
+    $cmds[] = "git clone /var/hubdrop/repos/$name.git /var/hubdrop/repos/$name";
+    $cmds[] = "cd /var/hubdrop/repos/$name";
+    $cmds[] = "git remote add drupal-$username $username@git.drupal.org:project/$name";
+    $cmds[] = "touch HUBDROP_TEST_COMMIT";
+    $cmds[] = "git add HUBDROP_TEST_COMMIT";
+    $cmds[] = "git commit -m 'HUBDROP: Testing if $username has access to this repo.'";
+    $cmds[] = "git rm HUBDROP_TEST_COMMIT";
+    $cmds[] = "git commit -m 'HUBDROP: Removing access test file.";
+
+    foreach ($cmds as $cmd){
+      exec($cmd);
+    }
+
+    // Test if this command works
+    print shell_exec("git push");
   }
 }
 
