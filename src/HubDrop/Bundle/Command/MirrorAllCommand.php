@@ -46,7 +46,7 @@ class MirrorAllCommand extends ContainerAwareCommand
         $output->writeln("<info>HUBDROP</info> Cloning $project->name");
         $project->cloneDrupal();
       }
-      else {
+      elseif (!$project->exists) {
         $missing_projects[] = $project->name;
       }
     }
