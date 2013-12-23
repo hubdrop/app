@@ -34,6 +34,7 @@ class HubDropController extends Controller
    */
   public function projectAction($project_name)
   {
+    $project_name = strtolower($project_name);
 
     // @TODO: Break out into its own route. Require a POST? Symfony Form API?
     // Mirror: GO!
