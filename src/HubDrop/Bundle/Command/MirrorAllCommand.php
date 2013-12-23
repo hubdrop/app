@@ -36,15 +36,13 @@ class MirrorAllCommand extends ContainerAwareCommand
     $output->writeln(strtr('<info>HUBDROP</info> Found %total mirrors', array('%total' => count($repos))));
 
     foreach ($repos as $mirror){
-      $project_name = $mirror['name'];
-
       // Get the project
-      $project = $hubdrop->getProject($project_name);
+      $project = $hubdrop->getProject($mirror['name'];);
 
       // If it is not yet cloned, clone it.
       if (!$project->cloned){
         $output->writeln("");
-        $output->writeln("<info>HUBDROP</info> Cloning $project_name");
+        $output->writeln("<info>HUBDROP</info> Cloning $project->name");
         $project->cloneDrupal();
       }
     }
