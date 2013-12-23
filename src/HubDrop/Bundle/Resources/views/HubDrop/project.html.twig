@@ -3,79 +3,73 @@
 {% block content_header '' %}
 
 {% block content %}
-
+  <div class="{% if project.mirrored %}mirrored{% endif %}">
     <div class="jumbotron">
-      <h1 class="panel-title">{{ project_name }}
-      <small id="mirror-status-label">
-          {% if project_exists == false %}
-          <span class="label label-danger">Not a Project</span>
-          {% elseif project_mirrored %}
-          <a href="{{urls.github.web}}" class="label label-success">Mirrored on GitHub</a>
-          {% else %}
-          <span class="label label-danger">Not Mirrored on GitHub</span>
-          {% endif %}
-      </small>
+      <h1 class="panel-title">{{ project.name }}
+        {% if project.exists == false %}
+          <small id="mirror-status-label">
+            <span class="label label-danger">Not a Project</span>
+          </small>
+        {% endif %}
       </h1>
 
-        <div id="drupal-info" class="panel panel-info">
-        {% if project_exists %}
-            <div class="panel-heading">
-                Drupal.org Links
-            </div>
+      {% if project.exists %}
+      <section class="container"><div class="row">
+
+        <div id="action" class="col-sm-12"">
+          <div id="mirror-status" class="text-center">
+              <img src="/img/druplicon.png">
+              {% if project.mirrored %}
+                  <span class="glyphicon glyphicon-transfer"></span>
+              {% else %}
+                  {%  if project.mirrored == FALSE and allow_mirroring %}
+                      <a href='?mirror=go' class="btn btn-success btn-lg" id="mirror-button"><span class="glyphicon glyphicon-transfer"></span><br /> Mirror On GitHub</a>
+                  {%  else  %}
+                      <a href='#' class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-transfer"></span><br /> Mirroring disabled</a>
+                  {%  endif %}
+              {%  endif %}
+              <img src="/img/github-mark.png">
+          </div>
+          <p class="text-muted text-center">
+              {% if project.mirrored %}
+              <small>Now Mirroring</small>
+              {% else %}
+              <small>Click the Big Green Button above to mirror this project on GitHub.</small>
+              {% endif %}
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div id="drupal-info" class="col-sm-6 small">
+          <div class="panel panel-info">
             <div class="list-group">
                 <a href="{{ urls.drupal.web }}" class="list-group-item">{{ urls.drupal.web }}</a>
                 <span class="list-group-item">
                     <input class="form-control" value="git clone {{ urls.drupal.http }}" onclick="this.select()"/>
+                </span>
             </div>
-        {% else %}
-            <div class="panel-heading text-warning">
-            Drupal.org project not found.
-            </div>
-            <div class="panel-body">
-            This is not a drupal project! If it were, it would live at <a href="{{urls.drupal.web}}" class="text-muted">{{urls.drupal.web}}</a>.
-             </div>
-        {% endif  %}
+          </div>
         </div>
+        <div id="github-info" class="col-sm-6 small"><div class="panel panel-info">
+            <div class="list-group">
+            <a href="{{ urls.github.web }}" class="list-group-item">{% if project.mirrored == false %}<strike>{% endif %}{{ urls.github.web }}{% if project.mirrored == false %}</strike>{% endif %}</a>
+            <span class="list-group-item">
+            <input class="form-control" value="git clone {{ urls.github.http }}" onclick="this.select()" {% if project.mirrored == false %}disabled="disabled"{% endif %}/>
+            </span>
+        </div></div></div>
+      </div></section>
+      {%  else  %}
+      <section class="container"><div class="row">
+          {{ project.name }} is not a Drupal.org project.
+      </div></section>
+      {%  endif %}
 
-      {% if project_exists %}
-      <div id="drupal-info" class="panel panel-info">
-        {% if project_mirrored == false %}
-          <div class="panel-heading">
-             Mirror on GitHub.com
-          </div>
-          <div class="panel-body">
-            <p class="text-muted">
-              This module is not yet mirrored on GitHub.  Hit the <strong>Big Green Button</strong>
-              below to mirror it to <a href="{{urls.github.web}}" class="text-muted">{{urls.github.web}}</a>.
-            </p>
-            <p id="mirror-button" class="text-center">
-              {%  if allow_mirroring %}
-                  <a href='?mirror=go' class="btn btn-success btn-lg"><span class="glyphicon glyphicon-transfer"></span> Mirror {{ project_name }} On GitHub</a>
-              {%  else  %}
-                  <a href='#' class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-transfer"></span> Mirroring is temporarily disabled.</a>
-              {%  endif %}
-            </p>
-          </div>
-      {% else %}
-          <div class="panel-heading">
-              GitHub.com links
-          </div>
-          <div class="list-group">
-              <a href="{{ urls.github.web }}" class="list-group-item">{{ urls.github.web }}</a>
-               <span class="list-group-item">
-                    <input class="form-control" value="git clone {{ urls.github.http }}" onclick="this.select()"/>
-               </span>
-               <span class="list-group-item">
-                    <input class="form-control" value="git clone {{ urls.github.ssh }}" onclick="this.select()"/>
-               </span>
-               <div class="list-group-item">
-                <p class="text-muted">
-                  This module is mirrored on GitHub.  It is updated every minute, approximately.
-                </p>
-               </div>
-      {% endif %}
-        </div>
-      </div>
-      {% endif %}
-</div>
+      {%  if project.mirrored %}
+        <p class="text-muted text-center">
+            This module is mirrored on GitHub.  It is updated every minute, approximately.
+        </p>
+      {%  endif %}
+    </div>
+  </div>
+  </div>
 {% endblock %}
