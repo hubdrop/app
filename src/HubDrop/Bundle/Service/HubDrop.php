@@ -8,8 +8,6 @@
 namespace HubDrop\Bundle\Service;
 
 use HubDrop\Bundle\Service\Project;
-use Github\Client as GithubClient;
-
 
 class HubDrop {
 
@@ -51,12 +49,14 @@ class HubDrop {
   public function getAllMirrors(){
 
     // Lookup all repositories for this github organization.
-    $client = new GithubClient();
+    $client = new \Github\Client();
     $client->authenticate($this->getGitHubToken(), '', \GitHub\Client::AUTH_URL_TOKEN);
 
     try {
-//      $repos = $client->api('repos');
-      $repos = $client->api('organization')->repositories($this->github_organization);
+      $api = $client->api('organization');
+      $paginator  = new \Github\ResultPager($client);
+      $parameters = array('github');
+      $repos = $paginator->fetchAll($api, 'repositories', $parameters);
       return $repos;
     }
     catch (ValidationFailedException $e) {

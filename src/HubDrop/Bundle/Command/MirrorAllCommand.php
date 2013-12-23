@@ -30,7 +30,7 @@ class MirrorAllCommand extends ContainerAwareCommand
     $hubdrop = $this->getContainer()->get('hubdrop');
 
     // Loop through all github repos.
-    $output->writeln('<info>HUBDROP</info> Lookup up mirrors...');
+    $output->writeln('<info>HUBDROP</info> Looking up all mirrors... this takes a moment.');
     $repos = $hubdrop->getAllMirrors();
 
     $output->writeln(strtr('<info>HUBDROP</info> Found %total mirrors', array('%total' => count($repos))));
