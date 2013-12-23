@@ -39,7 +39,6 @@ class MirrorAllCommand extends ContainerAwareCommand
       $project_name = $mirror['name'];
 
       // Get the project
-      $out = array();
       $project = $hubdrop->getProject($project_name);
 
       // If it is not yet cloned, clone it.
