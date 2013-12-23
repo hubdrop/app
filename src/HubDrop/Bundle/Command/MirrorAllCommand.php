@@ -32,6 +32,7 @@ class MirrorAllCommand extends ContainerAwareCommand
     // Loop through all github repos.
     $output->writeln('<info>HUBDROP</info> Looking up all mirrors... this takes a moment.');
     $repos = $hubdrop->getAllMirrors();
+    $missing_projects = array();
 
     $output->writeln(strtr('<info>HUBDROP</info> Found %total mirrors', array('%total' => count($repos))));
 
@@ -40,11 +41,18 @@ class MirrorAllCommand extends ContainerAwareCommand
       $project = $hubdrop->getProject($mirror['name']);
 
       // If it is not yet cloned, clone it.
-      if (!$project->cloned){
+      if ($project->exists && !$project->cloned){
         $output->writeln("");
         $output->writeln("<info>HUBDROP</info> Cloning $project->name");
         $project->cloneDrupal();
       }
+      else {
+        $missing_projects[] = $project->name;
+      }
+    }
+
+    if (count($missing_projects)){
+      $output->writeln(strtr('<info>HUBDROP</info> Warning: %total github repos are not actually drupal projects: %list', array('%total' => count($missing_projects), '%list' => implode(', ', $missing_projects))));
     }
   }
 }
