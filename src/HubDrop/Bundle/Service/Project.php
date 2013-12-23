@@ -49,7 +49,7 @@ class Project {
   public function __construct($name) {
     // Set properties
     // @TODO: Un-hardcode these properties.
-    $this->name = $name;
+    $this->name = strtolower($name);
     $this->urls = array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/$name",
