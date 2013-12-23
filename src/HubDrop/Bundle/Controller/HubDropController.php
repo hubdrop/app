@@ -17,7 +17,7 @@ class HubDropController extends Controller
    */
   public function homeAction()
   {
-    $project_name = $this->get('request')->query->get('project_name'));
+    $project_name = $this->get('request')->query->get('project_name');
     if ($project_name){
       return $this->redirect($this->generateUrl('_project', array(
         'project_name' => strtolower($project_name),
