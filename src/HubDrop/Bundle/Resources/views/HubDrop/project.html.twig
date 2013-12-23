@@ -2,16 +2,19 @@
 
 {% block content_header '' %}
 
+
 {% block content %}
-  <div class="{% if project.mirrored %}mirrored{% endif %}">
+    <div id="header">
+        <a class='pull-left' href='{{ path('_home') }}'><img src='/img/logo.png'></a>
+
+        <h1 class='pull-left'><a href='{{ path('_home') }}'>HubDrop.io</a></h1>
+
+        <h2 class='pull-right'><a href='http://drupal.org/project/{{ project.name }}' target="_blank">{{ project.name }}</a></h2>
+        <p>&nbsp;</p>
+    </div>
+
+    <div class="{% if project.mirrored %}mirrored{% endif %}">
     <div class="jumbotron">
-      <h1 class="panel-title">{{ project.name }}
-        {% if project.exists == false %}
-          <small id="mirror-status-label">
-            <span class="label label-danger">Not a Project</span>
-          </small>
-        {% endif %}
-      </h1>
 
       {% if project.exists %}
       <section class="container"><div class="row">

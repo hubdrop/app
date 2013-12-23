@@ -52,3 +52,7 @@ section.project {
 input:disabled{
   text-decoration:line-through;
 }
+
+.alert-success {
+  margin-top: 50px;
+}
