@@ -55,7 +55,7 @@ class HubDrop {
     try {
       $api = $client->api('organization');
       $paginator  = new \Github\ResultPager($client);
-      $parameters = array('github');
+      $parameters = array($this->github_organization);
       $repos = $paginator->fetchAll($api, 'repositories', $parameters);
       return $repos;
     }
