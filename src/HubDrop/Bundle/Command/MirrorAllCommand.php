@@ -37,7 +37,7 @@ class MirrorAllCommand extends ContainerAwareCommand
 
     foreach ($repos as $mirror){
       // Get the project
-      $project = $hubdrop->getProject($mirror['name'];);
+      $project = $hubdrop->getProject($mirror['name']);
 
       // If it is not yet cloned, clone it.
       if (!$project->cloned){
