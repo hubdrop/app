@@ -7,8 +7,8 @@
  *
  */
 namespace HubDrop\Bundle\Service;
-use Github\Client as GithubClient;
 
+use Github\Client as GithubClient;
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -173,7 +173,6 @@ class Project {
    *
    */
   public function mirror(){
-
     // If there is no drupal project, we can't mirror.
     if ($this->exists == FALSE){
       throw new NoProjectException('Not a Drupal project.');
@@ -319,6 +318,7 @@ class Project {
    */
   public function cloneDrupal(){
     $drupal_remote = $this->getUrl('drupal', 'http');
+    $drupal_remote_ssh = $this->getUrl('drupal', 'ssh');
     $github_remote = $this->getUrl('github', 'ssh');
     $target_path = $this->getUrl('localhost', 'path');
 
@@ -332,22 +332,27 @@ class Project {
 
     $cmds = array();
     $cmds[] = "cd $target_path";
+
+    // Removes the origin URL. we will push to the other remotes.
+    $cmds[] = 'git config --local --unset-all remote.origin.url';
+
+    // Removes the "fetch all refs" config to prevent github pull requests from
+    // coming in.
     $cmds[] = 'git config --local --unset-all remote.origin.fetch';
+
+    // Adding back the refs we do want.
     $cmds[] = 'git config --local remote.origin.fetch "+refs/tags/*:refs/tags/*"';
     $cmds[] = 'git config --local remote.origin.fetch "+refs/heads/*:refs/heads/*" --add';
 
-    // Set push url to github
-    $cmds[] = "git remote set-url --push origin $github_remote";
-
     // Add remotes for github and drupal
-    $drupal_url = $this->getUrl('drupal', 'ssh');
-    $git_url = $this->getUrl('github', 'ssh');
+    $git_remote = $this->getUrl('github', 'ssh');
 
-    $cmds[] = "git remote add drupal $drupal_url";
-    $cmds[] = "git remote add github $git_url";
+    $cmds[] = "git remote add github $git_remote";
+    $cmds[] = "git remote add drupal $drupal_remote_ssh";
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
+      print $cmd;
       exec($cmd);
     }
 
