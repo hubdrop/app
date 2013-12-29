@@ -217,8 +217,7 @@ class Project {
   private function pushAndPull(){
     // @TODO: ensure the remotes exist?
     $cmds = array();
-    $cmds[] = "git fetch -p drupal";
-    $cmds[] = "git fetch -p github";
+    $cmds[] = "git fetch -p origin";
     $cmds[] = "git push --mirror";
 
     // @TODO: Throw an exception if something fails.
@@ -346,9 +345,9 @@ class Project {
 
     // Add remotes for github and drupal
     $git_remote = $this->getUrl('github', 'ssh');
-
-    $cmds[] = "git remote add github $git_remote";
-    $cmds[] = "git remote add drupal $drupal_remote_ssh";
+//
+//    $cmds[] = "git remote add github $git_remote";
+//    $cmds[] = "git remote add drupal $drupal_remote_ssh";
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
