@@ -216,14 +216,17 @@ class Project {
    */
   private function pushAndPull(){
     // @TODO: ensure the remotes exist?
+    // @TODO: --mirror isn't needed if the remote has mirror:true
     $cmds = array();
     $cmds[] = "git fetch -p drupal";
+    $cmds[] = "git push github --all";
     $cmds[] = "git fetch -p github";
-    $cmds[] = "git push --mirror";
+    $cmds[] = "git push drupal --all";
 
     // @TODO: Throw an exception if something fails.
     chdir($this->getUrl('localhost', 'path'));
     foreach ($cmds as $cmd){
+      print $cmd. "\n";
       exec($cmd);
     }
   }
