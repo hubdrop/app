@@ -218,7 +218,7 @@ class Project {
     // @TODO: ensure the remotes exist?
     $cmds = array();
     $cmds[] = "git fetch -p origin";
-    $cmds[] = "git push --mirror";
+    $cmds[] = "git push origin --mirror";
 
     // @TODO: Throw an exception if something fails.
     chdir($this->getUrl('localhost', 'path'));
@@ -335,19 +335,28 @@ class Project {
     // Removes the origin URL. we will push to the other remotes.
 //    $cmds[] = 'git config --local --unset-all remote.origin.url';
 
-    // Removes the "fetch all refs" config to prevent github pull requests from
+    // Removes the "fetch all refs" config and adding back the refs we do want.
+    // This prevents github pull requests from going through.
     // coming in.
     $cmds[] = 'git config --local --unset-all remote.origin.fetch';
-
-    // Adding back the refs we do want.
     $cmds[] = 'git config --local remote.origin.fetch "+refs/tags/*:refs/tags/*"';
     $cmds[] = 'git config --local remote.origin.fetch "+refs/heads/*:refs/heads/*" --add';
 
+
     // Add remotes for github and drupal
     $git_remote = $this->getUrl('github', 'ssh');
-//
-//    $cmds[] = "git remote add github $git_remote";
-//    $cmds[] = "git remote add drupal $drupal_remote_ssh";
+
+    $cmds[] = "git remote add github $git_remote";
+    $cmds[] = "git remote add drupal $drupal_remote_ssh";
+
+    // Fix Refs
+    $cmds[] = 'git config --local --unset-all remote.drupal.fetch';
+    $cmds[] = 'git config --local remote.drupal.fetch "+refs/tags/*:refs/tags/*"';
+    $cmds[] = 'git config --local remote.drupal.fetch "+refs/heads/*:refs/heads/*" --add';
+
+    $cmds[] = 'git config --local --unset-all remote.github.fetch';
+    $cmds[] = 'git config --local remote.github.fetch "+refs/tags/*:refs/tags/*"';
+    $cmds[] = 'git config --local remote.github.fetch "+refs/heads/*:refs/heads/*" --add';
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
