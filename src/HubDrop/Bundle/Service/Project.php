@@ -204,6 +204,9 @@ class Project {
       throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
     }
 
+    // Update all remotes
+    $this->pushAndPull();
+
     // Get and set default branch
     $this->default_branch = $this->getCurrentBranch();
     $this->setDefaultBranch($this->default_branch);
@@ -211,6 +214,21 @@ class Project {
 
   /**
    * Pulls & Pushes the Project Repo.
+   */
+  private function pushAndPull(){
+    $cmds = array();
+    $cmds[] = "git fetch -p origin";
+    $cmds[] = "git push --mirror";
+
+    // @TODO: Throw an exception if something fails.
+    chdir($this->getUrl('localhost', 'path'));
+    foreach ($cmds as $cmd){
+      exec($cmd);
+    }
+  }
+
+  /**
+   * Sets the remote source to drupal or github.
    */
   public function setSource($source){
     $cmds = array();
