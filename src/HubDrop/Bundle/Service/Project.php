@@ -334,7 +334,7 @@ class Project {
     $cmds[] = "cd $target_path";
 
     // Removes the origin URL. we will push to the other remotes.
-    $cmds[] = 'git config --local --unset-all remote.origin.url';
+//    $cmds[] = 'git config --local --unset-all remote.origin.url';
 
     // Removes the "fetch all refs" config to prevent github pull requests from
     // coming in.
@@ -352,13 +352,12 @@ class Project {
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
-      print $cmd;
       exec($cmd);
     }
 
     $this->cloned = TRUE;
 
-    // @TODO: detect default branch?
+    $this->setSource('drupal');
 
   }
 
