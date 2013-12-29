@@ -8,8 +8,8 @@
  */
 namespace HubDrop\Bundle\Service;
 use Github\Client as GithubClient;
-use Guzzle\Http\Client;
 
+use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -216,8 +216,10 @@ class Project {
    * Pulls & Pushes the Project Repo.
    */
   private function pushAndPull(){
+    // @TODO: ensure the remotes exist?
     $cmds = array();
-    $cmds[] = "git fetch -p origin";
+    $cmds[] = "git fetch -p drupal";
+    $cmds[] = "git fetch -p github";
     $cmds[] = "git push --mirror";
 
     // @TODO: Throw an exception if something fails.
