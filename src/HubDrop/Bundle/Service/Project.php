@@ -30,6 +30,10 @@ class Project {
   // Whether or not the Drupal project is cloned locally.
   public $cloned = FALSE;
 
+  // The default git branch this project is on.
+  public $default_branch = '';
+
+
   // @TODO: Move to HubDrop service and use service parameters to store default.
   // These are really a part of the larger HubDrop service, but I
   // haven't learned how to access that from a Project class yet!
@@ -79,6 +83,9 @@ class Project {
 
       // We will assume the clone is mirrored (until we can't).
       $this->mirrored = TRUE;
+
+      // Get the default branch
+      $this->default_branch = $this->getCurrentBranch();
     }
     // If it is not cloned locally...
     else {
@@ -197,16 +204,9 @@ class Project {
       throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
     }
 
-    $cmds = array();
-    $cmds[] = "git fetch -p origin";
-    $cmds[] = "git push --mirror";
-
-    // @TODO: Throw an exception if something fails.
-    chdir($this->getUrl('localhost', 'path'));
-    foreach ($cmds as $cmd){
-      print $cmd . "\n";
-      exec($cmd);
-    }
+    // Get and set default branch
+    $this->default_branch = $this->getCurrentBranch();
+    $this->setDefaultBranch($this->default_branch);
   }
 
   /**
@@ -250,6 +250,50 @@ class Project {
   }
 
   /**
+   * Gets the current branch of the local repo.
+   */
+  public function getCurrentBranch(){
+    // Look for default branch
+    $default_branch = 'master';
+    chdir($this->getUrl('localhost', 'path'));
+    $cmd = "git branch -a";
+    $branches = array();
+    exec($cmd, $branches);
+    foreach ($branches as $branch){
+      // Sometimes there is no default set, like for help.git
+      $default_branch = $branch;
+      if (strpos($branch, '*') === 0){
+        $default_branch = str_replace('* ', '', $branch);
+        break;
+      }
+    }
+    return $default_branch;
+  }
+
+  /**
+   * Sets the default branch in the GitHub repo
+   */
+  public function setDefaultBranch($branch = NULL){
+
+    // Use the project's branch, if no parameter is set.
+    if (!$branch){
+      $branch = $this->default_branch;
+    }
+
+    // Set the default branch of a repo.
+    try {
+      $client = new GithubClient();
+      $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
+
+      $repo = $client->api('repo')->update($this->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
+      $this->github_repo = $repo;
+    }
+    catch (\Github\Exception\ValidationFailedException $e) {
+      return FALSE;
+    }
+  }
+
+  /**
    * $project->cloneDrupal()
    * Runs git clone
    */
@@ -282,6 +326,9 @@ class Project {
     }
 
     $this->cloned = TRUE;
+
+    // @TODO: detect default branch?
+
   }
 
   /**
