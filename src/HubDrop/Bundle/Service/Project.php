@@ -370,11 +370,9 @@ class Project {
   }
 
   /**
-   * Quickly checks if a user is a maintainer of a module.
-   * @param $username
-   * @param $password
+   * Logs into drupal.org with the password located at /etc/hubdrop_drupal_pass
    */
-  public function checkMaintainership($username, $password){
+  public function getMaintainers(){
     $name = $this->name;
 
     // Throw exception if we haven't cloned it yet.
@@ -382,27 +380,37 @@ class Project {
       throw new NotClonedException("THIS project hasn't been cloned yet.");
     }
 
-    // If clone doesn't exist, clone it
-    if (!file_exists("/var/hubdrop/repos/$name")){
-      exec("git clone /var/hubdrop/repos/$name.git /var/hubdrop/repos/$name");
-    }
+    // Get a Mink object
+    require_once "mink.phar";
+    $mink = new \Behat\Mink\Mink(array(
+      'hubdrop' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
+    ));
+    $mink->setDefaultSessionName('hubdrop');
+    $mink->getSession()->visit($this->getUrl());
 
-    chdir("/var/hubdrop/repos/$name");
+    // Visit the project page, then click "Log in / Register"
+    $mink->getSession()->getPage()->findLink('Log in / Register')->click();
 
-    $cmds = array();
-    $cmds[] = "git remote add drupal-$username $username@git.drupal.org:project/$name";
-    $cmds[] = "touch HUBDROP_TEST_COMMIT";
-    $cmds[] = "git add HUBDROP_TEST_COMMIT";
-    $cmds[] = "git commit -m 'HUBDROP: Testing if $username has access to this repo.'";
-    $cmds[] = "git rm HUBDROP_TEST_COMMIT";
-    $cmds[] = "git commit -m 'HUBDROP: Removing access test file.'";
+    // Fill out the login form and click "Log in"
+    $page = $mink->getSession()->getPage();
 
-    foreach ($cmds as $cmd){
-      exec($cmd);
-    }
+    $username = 'hubdrop';
+    $password = file_get_contents('/etc/hubdrop_drupal_pass');
 
-    // Test if this command works
-    print shell_exec("git push drupal-$username");
+    $el = $page->find('css', '#edit-name');
+    $el->setValue($username);
+
+    $el = $page->find('css', '#edit-pass');
+    $el->setValue($password);
+
+    $page->findButton('Log in')->click();
+
+    // The project page, hopefully
+    $page = $mink->getSession()->getPage();
+    $link = $page->findLink('Maintainers');
+
+    // @TODO: Click "Maintainers"
+
   }
 }
 
