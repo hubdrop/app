@@ -18,31 +18,25 @@ class UpdateCommand extends ContainerAwareCommand
   {
     $this
       ->setName('hubdrop:update')
-      ->setDescription('Update all mirrors of HubDrop.');
+      ->setDescription('Update a mirror of HubDrop.')
+      ->addArgument(
+        'name',
+        InputArgument::REQUIRED,
+        'Which drupal project are you talking about?'
+      );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    // Get hubdrop service.
-    $hubdrop = $this->getContainer()->get('hubdrop');
+    $name = $input->getArgument('name');
 
-    // Loop through all repo folders.
-    if ($handle = opendir($hubdrop->repo_path)) {
-      $blacklist = array('.', '..');
-      while (false !== ($file = readdir($handle))) {
-        if (!in_array($file, $blacklist)) {
-          $project_name = str_replace(".git", "", $file);
+    $out = array();
+    $out[] = "";
+    $out[] = "<info>HUBDROP</info> Updating mirror of $name";
+    $output->writeln($out);
 
-          $out = array();
-          $out[] = "";
-          $out[] = "<info>HUBDROP</info> Updating mirror of $project_name";
-          $output->writeln($out);
-
-          $project = $hubdrop->getProject($project_name);
-          $project->update();
-        }
-      }
-      closedir($handle);
-    }
+    $project = $this->getContainer()->get('hubdrop')
+      ->getProject($input->getArgument('name'));
+    $project->update();
   }
 }
