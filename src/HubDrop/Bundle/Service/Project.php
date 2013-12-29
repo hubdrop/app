@@ -7,10 +7,10 @@
  *
  */
 namespace HubDrop\Bundle\Service;
-use Guzzle\Http\Client;
-use Guzzle\Http\Exception\BadResponseException;
 use Github\Client as GithubClient;
+use Guzzle\Http\Client;
 
+use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class Project {
@@ -335,8 +335,14 @@ class Project {
     $cmds[] = 'git config --local remote.origin.fetch "+refs/heads/*:refs/heads/*" --add';
 
     // Set push url to github
-    // @TODO: There will be a switchRemote command.
     $cmds[] = "git remote set-url --push origin $github_remote";
+
+    // Add remotes for github and drupal
+    $drupal_url = $this->getUrl('drupal', 'ssh');
+    $git_url = $this->getUrl('github', 'ssh');
+
+    $cmds[] = "git remote add drupal $drupal_url";
+    $cmds[] = "git remote add github $git_url";
 
     // @TODO: Throw an exception if something fails.
     foreach ($cmds as $cmd){
