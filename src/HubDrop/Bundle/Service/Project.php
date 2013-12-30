@@ -10,8 +10,8 @@ namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
 use Guzzle\Http\Client;
-use Guzzle\Http\Exception\BadResponseException;
 
+use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -446,8 +446,15 @@ class Project {
         }
       }
     }
+
+    // @TODO: Find GitHub Usernames
+
     return $data;
   }
+
+  /**
+   * @TODO: updateMaintainers() method.
+   */
 }
 
 
