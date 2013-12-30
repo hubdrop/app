@@ -9,8 +9,8 @@
 namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
-use Guzzle\Http\Client;
 
+use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -426,6 +426,8 @@ class Project {
       $path = explode('/', $url);
       $uid = array_pop($path);
       $data[$uid] = array(
+        // @TODO: getValue() is not working on this link!
+        // Workaround could be to get it when looking for a github username.
         'name' => $user->getValue(),
       );
     }
