@@ -11,7 +11,9 @@ namespace HubDrop\Bundle\Service;
 use Github\Client as GithubClient;
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
+
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Project {
 
@@ -406,11 +408,45 @@ class Project {
     $page->findButton('Log in')->click();
 
     // The project page, hopefully
+    $link = $mink->getSession()->getPage()->findLink('Maintainers');
+    if (!$link) {
+      throw new AccessDeniedHttpException('Unable to access project maintainers list.');
+    }
+
+    // Click "Maintainers"
+    $link->click();
     $page = $mink->getSession()->getPage();
-    $link = $page->findLink('Maintainers');
 
-    // @TODO: Click "Maintainers"
+    // Find users
+    $data = array();
+    $users = $page->findAll('css', '#project-maintainers-form .username');
+    foreach ($users as $user){
+      $url = $user->getAttribute('href');
+      // @TODO: learn regular expressions
+      $path = explode('/', $url);
+      $uid = array_pop($path);
+      $data[$uid] = array(
+        'name' => $user->getValue(),
+      );
+    }
 
+    // Find permissions
+    $permissions = $page->findAll('css', '#project-maintainers-form .form-checkbox');
+    foreach ($permissions as $box){
+      $id = $box->getAttribute('id');
+      $id_parts = explode('-', $id);
+
+      if (is_numeric($id_parts[2])){
+
+        if (isset($data[$id_parts[2]][$id_parts[4]])){
+          $data[$id_parts[2]][$id_parts[5]] = $box->isChecked();
+        }
+        else {
+          $data[$id_parts[2]][$id_parts[4]] = $box->isChecked();
+        }
+      }
+    }
+    return $data;
   }
 }
 
