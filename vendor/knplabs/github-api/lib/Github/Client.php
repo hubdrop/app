@@ -134,6 +134,11 @@ class Client
                 $api = new Api\Authorizations($this);
                 break;
 
+          case 'team':
+          case 'teams':
+            $api = new Api\Organization\Teams($this);
+            break;
+
             default:
                 throw new InvalidArgumentException(sprintf('Undefined api instance called: "%s"', $name));
         }
