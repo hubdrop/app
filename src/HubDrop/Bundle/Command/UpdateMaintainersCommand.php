@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AddMaintainerCommand extends ContainerAwareCommand
+class UpdateMaintainersCommand extends ContainerAwareCommand
 {
   protected function configure()
   {
@@ -34,7 +34,5 @@ class AddMaintainerCommand extends ContainerAwareCommand
     $project = $hubdrop->getProject($input->getArgument('name'));
 
     $project->updateMaintainers();
-//    $data = $project->getMaintainers();
-//    print_r($data);
   }
 }
