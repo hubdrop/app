@@ -33,6 +33,7 @@ class UpdateMaintainersCommand extends ContainerAwareCommand
     $hubdrop = $this->getContainer()->get('hubdrop');
     $project = $hubdrop->getProject($input->getArgument('name'));
 
+    // Update maintainers
     $project->updateMaintainers();
   }
 }
