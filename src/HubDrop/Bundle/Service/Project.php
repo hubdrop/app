@@ -9,7 +9,7 @@
 namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
-use Guzzle\Http\Client;
+use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -129,7 +129,7 @@ class Project {
       return file_exists($this->getUrl($remote, 'path'));
     }
     else {
-      $client = new Client();
+      $client = new GuzzleClient();
       $url = $this->getUrl($remote, $type);
 
       // Check the HTTP response with Guzzle.
@@ -377,15 +377,44 @@ class Project {
     $client = new GithubClient();
     $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
 
-    // 1. Lookup maintainers from drupal.org
+    $name = $this->name;
+
+    // 1. Check for github team. If doesn't exist, create it.
+    // @TODO: move team creation to $this->createRepo()?
+    $response = $client->getHttpClient()->get('/orgs/' . $this->github_organization . '/teams');
+    $teams = \Github\HttpClient\Message\ResponseMediator::getContent($response);
+
+    foreach ($teams as $team){
+      if ($team['name'] == "$name committers"){
+        $team_id = $team['id'];
+        break;
+      }
+    }
+
+    // If team not found... create one.
+    if (empty($team_id)){
+      $vars = array(
+        "name" => "$name committers",
+        "permission" => "push",
+        "repo_names" => array(
+          "$this->github_organization/$name",
+        ),
+      );
+      $response = $client->getHttpClient()->post('/orgs/' . $this->github_organization . '/teams', $vars);
+
+      $team = \Github\HttpClient\Message\ResponseMediator::getContent($response);
+      $team_id = $team['id'];
+    }
+
+    // 2. Lookup maintainers from drupal.org
     $data = $this->getMaintainers();
+    print_r($data);
 
-    // 2. Check for github team. If doesn't exist, create it.
-    // @TODO: move team creation to $this->createRepo()
-    $teams = $client->api('teams')->get();
-//    print_r($teams);
-
-    // 3. Add to push/pull team.
+//    // 3. Remove all existing maintainers, then add to push/pull team.
+//    $response = $client->getHttpClient()->get('/teams/' . $eam_id . '/members', $vars);
+//    $members = \Github\HttpClient\Message\ResponseMediator::getContent($response);
+//
+//    print_r($members);
 
     // 4. Add to admin team.
 
@@ -394,8 +423,7 @@ class Project {
   /**
    * Logs into drupal.org with the password located at /etc/hubdrop_drupal_pass
    */
-  private function getMaintainers(){
-    $name = $this->name;
+  public function getMaintainers(){
 
     // Throw exception if we haven't cloned it yet.
     if ($this->cloned == FALSE){
@@ -403,7 +431,7 @@ class Project {
     }
 
     // Get a Mink object
-    require_once "mink.phar";
+//    require_once "mink.phar";
     $mink = new \Behat\Mink\Mink(array(
       'hubdrop' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
     ));
@@ -489,11 +517,11 @@ class Project {
     // Get a Mink object
     require_once "mink.phar";
     $mink = new \Behat\Mink\Mink(array(
-      'hubdrop' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
+      'hubdrop_user' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
     ));
 
     // Load the developer's page.
-    $mink->setDefaultSessionName('hubdrop');
+    $mink->setDefaultSessionName('hubdrop_user');
     $mink->getSession()->visit("http://drupal.org/user/$uid");
 
     // Look for a link to a github profile

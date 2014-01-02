@@ -34,5 +34,7 @@ class AddMaintainerCommand extends ContainerAwareCommand
     $project = $hubdrop->getProject($input->getArgument('name'));
 
     $project->updateMaintainers();
+//    $data = $project->getMaintainers();
+//    print_r($data);
   }
 }
