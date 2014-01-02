@@ -226,6 +226,11 @@ class Project {
     // Get and set default branch
     $this->default_branch = $this->getCurrentBranch();
     $this->setDefaultBranch($this->default_branch);
+
+    // If source == github, update maintainers
+    if ($this->source == 'github'){
+      $this->updateMaintainers();
+    }
   }
 
   /**
@@ -403,7 +408,7 @@ class Project {
       if (!empty($user['github_username'])){
         $members[] = $user['github_username'];
       }
-      if (!empty($user['administer'])){
+      if (!empty($user['github_username']) && !empty($user['administer'])){
         $admins[] = $user['github_username'];
       }
     }
@@ -445,18 +450,20 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id_admin = $team['id'];
     }
+
     // If team does exist, remove all members
-    else {
+    if (!empty($team_id)){
       // Committers
       $team_members = $client->api('teams')->members($team_id);
       foreach ($team_members as $member){
-        $client->api('teams')->addMember($team_id, $member['login']);
+        $client->api('teams')->removeMember($team_id, $member['login']);
       }
-
+    }
+    if (!empty($team_id_admin)){
       // Admins
       $team_members = $client->api('teams')->members($team_id_admin);
       foreach ($team_members as $member){
-        $client->api('teams')->addMember($team_id_admin, $member['login']);
+        $client->api('teams')->removeMember($team_id_admin, $member['login']);
       }
     }
 
