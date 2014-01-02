@@ -17,30 +17,13 @@ class AddMaintainerCommand extends ContainerAwareCommand
   protected function configure()
   {
     $this
-      ->setName('hubdrop:maintainers')
-      ->setDescription('Looks up maintainers.')
+      ->setName('hubdrop:update_maintainers')
+      ->setDescription('Update GitHub maintainers based on Drupal.org info.')
       ->addArgument(
         'name',
         InputArgument::REQUIRED,
         'Which drupal project are we talkin, here?'
       )
-//      ->addArgument(
-//        'username',
-//        InputArgument::REQUIRED,
-//        'What is your drupal username?'
-//      )
-//      ->addOption(
-//        'github_username',
-//        null,
-//        InputOption::VALUE_OPTIONAL,
-//        'What is your github username, if different than your drupal username?'
-//      )
-//      ->addOption(
-//         'password',
-//         null,
-//         InputOption::VALUE_OPTIONAL,
-//         'What is Your drupal.org password?'
-//      )
     ;
   }
 
@@ -50,8 +33,6 @@ class AddMaintainerCommand extends ContainerAwareCommand
     $hubdrop = $this->getContainer()->get('hubdrop');
     $project = $hubdrop->getProject($input->getArgument('name'));
 
-    $data = $project->getMaintainers();
-    print_r($data);
-
+    $project->updateMaintainers();
   }
 }
