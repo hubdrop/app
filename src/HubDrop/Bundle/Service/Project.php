@@ -34,6 +34,9 @@ class Project {
   // The default git branch this project is on.
   public $default_branch = '';
 
+  // The current source of this project. (drupal or github)
+  public $source= '';
+
 
   // @TODO: Move to HubDrop service and use service parameters to store default.
   // These are really a part of the larger HubDrop service, but I
@@ -87,6 +90,16 @@ class Project {
 
       // Get the default branch
       $this->default_branch = $this->getCurrentBranch();
+
+      // Get the current source
+      $source = $this->exec('git config --get remote.origin.url');
+
+      if (trim($source) == trim($this->getUrl('drupal', 'http'))){
+        $this->source = 'drupal';
+      }
+      else {
+        $this->source = 'github';
+      }
     }
     // If it is not cloned locally...
     else {
@@ -104,6 +117,9 @@ class Project {
    * Return a specific URL
    */
   public function getUrl($remote = 'drupal', $type = 'web') {
+    if ($remote == 'localhost'){
+      $type = 'path';
+    }
     if (isset($this->urls[$remote]) && isset($this->urls[$remote][$type])){
       return $this->urls[$remote][$type];
     }
@@ -614,8 +630,12 @@ class Project {
   }
 
   /**
-   * @TODO: updateMaintainers() method.
+   * Exec Helper
    */
+  protected function exec($cmd){
+    chdir($this->getUrl('localhost'));
+    return shell_exec($cmd);
+  }
 
 }
 
