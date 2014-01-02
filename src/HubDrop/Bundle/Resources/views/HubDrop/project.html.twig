@@ -77,6 +77,21 @@
           The source for this module lives on GitHub.
         </p>
       {% endif %}
+
+        {% if project.maintainers %}
+            <h3>GitHub Maintainers</h3>
+            <ul>
+            {% for user in project.committers %}
+                <li>{{ user.username|e }} <a href="http://drupal.org/user/{{ user.username }}" class="small text-muted">http://drupal.org/user/{{ user.uid }}</a> <a href="http://github.com/{{ user.username }}" class="small text-muted">http://github.com/{{ user.username }}</a></li>
+            {% endfor %}
+            </ul>
+            <p>Are you a maintainer and are missing from this list? Add a link to your github profile to your Drupal.org account and we will add you on the next update.</p>
+
+        {% endif %}
+
+
+
+
     </div>
   </div>
   </div>
