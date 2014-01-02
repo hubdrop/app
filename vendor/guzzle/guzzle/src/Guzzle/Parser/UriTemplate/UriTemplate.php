@@ -9,8 +9,6 @@ namespace Guzzle\Parser\UriTemplate;
  */
 class UriTemplate implements UriTemplateInterface
 {
-    const DEFAULT_PATTERN = '/\{([^\}]+)\}/';
-
     /** @var string URI template */
     private $template;
 
@@ -18,7 +16,7 @@ class UriTemplate implements UriTemplateInterface
     private $variables;
 
     /** @var string Regex used to parse expressions */
-    private $regex = self::DEFAULT_PATTERN;
+    private static $regex = '/\{([^\}]+)\}/';
 
     /** @var array Hash for quick operator lookups */
     private static $operatorHash = array(
@@ -38,24 +36,15 @@ class UriTemplate implements UriTemplateInterface
 
     public function expand($template, array $variables)
     {
-        if ($this->regex == self::DEFAULT_PATTERN && false === strpos($template, '{')) {
+        // Check to ensure that the preg_* function is needed
+        if (false === strpos($template, '{')) {
             return $template;
         }
 
         $this->template = $template;
         $this->variables = $variables;
 
-        return preg_replace_callback($this->regex, array($this, 'expandMatch'), $this->template);
-    }
-
-    /**
-     * Set the regex patten used to expand URI templates
-     *
-     * @param string $regexPattern
-     */
-    public function setRegex($regexPattern)
-    {
-        $this->regex = $regexPattern;
+        return preg_replace_callback(self::$regex, array($this, 'expandMatch'), $this->template);
     }
 
     /**

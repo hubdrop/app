@@ -14,19 +14,16 @@ class PostFile implements PostFileInterface
     protected $fieldName;
     protected $contentType;
     protected $filename;
-    protected $postname;
 
     /**
      * @param string $fieldName   Name of the field
-     * @param string $filename    Local path to the file
-     * @param string $postname    Remote post file name
+     * @param string $filename    Path to the file
      * @param string $contentType Content-Type of the upload
      */
-    public function __construct($fieldName, $filename, $contentType = null, $postname = null)
+    public function __construct($fieldName, $filename, $contentType = null)
     {
         $this->fieldName = $fieldName;
         $this->setFilename($filename);
-        $this->postname = $postname ? $postname : basename($filename);
         $this->contentType = $contentType ?: $this->guessContentType();
     }
 
@@ -58,21 +55,9 @@ class PostFile implements PostFileInterface
         return $this;
     }
 
-    public function setPostname($postname)
-    {
-        $this->postname = $postname;
-
-        return $this;
-    }
-
     public function getFilename()
     {
         return $this->filename;
-    }
-
-    public function getPostname()
-    {
-        return $this->postname;
     }
 
     public function setContentType($type)
@@ -92,11 +77,11 @@ class PostFile implements PostFileInterface
         // PHP 5.5 introduced a CurlFile object that deprecates the old @filename syntax
         // See: https://wiki.php.net/rfc/curl-file-upload
         if (function_exists('curl_file_create')) {
-            return curl_file_create($this->filename, $this->contentType, $this->postname);
+            return curl_file_create($this->filename, $this->contentType, basename($this->filename));
         }
 
         // Use the old style if using an older version of PHP
-        $value = "@{$this->filename};filename=" . $this->postname;
+        $value = "@{$this->filename};filename=" . basename($this->filename);
         if ($this->contentType) {
             $value .= ';type=' . $this->contentType;
         }

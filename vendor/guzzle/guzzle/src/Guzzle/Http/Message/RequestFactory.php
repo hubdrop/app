@@ -294,26 +294,22 @@ class RequestFactory implements RequestFactoryInterface
 
     protected function visit_timeout(RequestInterface $request, $value, $flags)
     {
-        if (defined('CURLOPT_TIMEOUT_MS')) {
-            $request->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, $value * 1000);
-        } else {
-            $request->getCurlOptions()->set(CURLOPT_TIMEOUT, $value);
-        }
+        $request->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, $value * 1000);
     }
 
     protected function visit_connect_timeout(RequestInterface $request, $value, $flags)
     {
-        if (defined('CURLOPT_CONNECTTIMEOUT_MS')) {
-            $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT_MS, $value * 1000);
-        } else {
-            $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT, $value);
-        }
+        $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT_MS, $value * 1000);
     }
 
     protected function visit_debug(RequestInterface $request, $value, $flags)
     {
-        if ($value) {
+        if (class_exists('Guzzle\Plugin\Log\LogPlugin')) {
+            $request->addSubscriber(LogPlugin::getDebugPlugin());
+        } else {
+            // @codeCoverageIgnoreStart
             $request->getCurlOptions()->set(CURLOPT_VERBOSE, true);
+            // @codeCoverageIgnoreEnd
         }
     }
 

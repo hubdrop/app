@@ -47,7 +47,6 @@ class Server
     {
         $this->port = $port ?: self::DEFAULT_PORT;
         $this->client = new Client($this->getUrl());
-        register_shutdown_function(array($this, 'stop'));
     }
 
     /**
