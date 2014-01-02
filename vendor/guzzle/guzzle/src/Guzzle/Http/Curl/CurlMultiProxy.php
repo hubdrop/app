@@ -144,4 +144,8 @@ class CurlMultiProxy extends AbstractHasDispatcher implements CurlMultiInterface
             $this->handles = array_values($this->handles);
         }
     }
+
+    public function getState(){
+      parent::getState();
+    }
 }
