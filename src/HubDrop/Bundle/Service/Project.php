@@ -451,7 +451,11 @@ class Project {
     $page = $mink->getSession()->getPage();
 
     $username = 'hubdrop';
-    $password = file_get_contents('/etc/hubdrop_drupal_pass');
+    if (file_exists('/etc/hubdrop_drupal_pass')){
+      $password = file_get_contents('/etc/hubdrop_drupal_pass');
+    } else {
+      throw new \Exception("drupal.org user hubdrop password not found in /etc/hubdrop_drupal_pass");
+    }
 
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
