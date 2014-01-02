@@ -49,18 +49,9 @@ class AddMaintainerCommand extends ContainerAwareCommand
     // Get hubdrop service & project.
     $hubdrop = $this->getContainer()->get('hubdrop');
     $project = $hubdrop->getProject($input->getArgument('name'));
-//
-//    // Check if the user is a maintainer.
-//    $username = $input->getArgument('username');
-//    $password = $input->getOption('password');
-//
-//    // Check for repo.  If not, mirror it.
-//    if (!$project->cloned){
-//      $project->mirror();
-//    }
 
-    $project->getMaintainers();
-
+    $data = $project->getMaintainers();
+    print_r($data);
 
   }
 }

@@ -9,7 +9,6 @@
 namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
-
 use Guzzle\Http\Client;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -410,7 +409,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new AccessDeniedHttpException('Unable to access project maintainers list.');
+      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the drupal.org project maintainsers.');
     }
 
     // Click "Maintainers"
@@ -425,10 +424,20 @@ class Project {
       // @TODO: learn regular expressions
       $path = explode('/', $url);
       $uid = array_pop($path);
+      $username = $user->getText();
+
+      // Lookup github username locally.
+      if (file_exists('/var/hubdrop/.users/' . $uid)){
+        $github_username = file_get_contents('/var/hubdrop/.users/' . $uid);
+      }
+      else {
+        $github_username = $this->getGithubAccount($uid);
+      }
+
       $data[$uid] = array(
-        // @TODO: getValue() is not working on this link!
-        // Workaround could be to get it when looking for a github username.
-        'name' => $user->getValue(),
+        'uid' => $uid,
+        'username' => $username,
+        'github_username' => $github_username,
       );
     }
 
@@ -450,13 +459,64 @@ class Project {
     }
 
     // @TODO: Find GitHub Usernames
+    foreach ($data as $uid => $perms){
+      if (file_exists('/var/hubdrop/.users/' . $uid)){
 
+      }
+    }
+
+    print_r($data);
     return $data;
+
   }
 
   /**
    * @TODO: updateMaintainers() method.
    */
+
+  /**
+   * Get a maintainer's github username and save it.
+   */
+  public function getGithubAccount($uid){
+
+    // Get a Mink object
+    require_once "mink.phar";
+    $mink = new \Behat\Mink\Mink(array(
+      'hubdrop' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
+    ));
+
+    // Load the developer's page.
+    $mink->setDefaultSessionName('hubdrop');
+    $mink->getSession()->visit("http://drupal.org/user/$uid");
+
+    // Look for a link to a github profile
+    $github_profile_link = $mink->getSession()->getPage()->find('xpath', '//a[contains(@href, "github.com")]');
+
+    // If there is a link, click it to make sure the user exists.
+    if ($github_profile_link){
+
+      // Click the link
+      $github_profile_link->click();
+      $github_profile_page = $mink->getSession()->getPage();
+
+      // Check the response
+      $response = $github_profile_page->getSession()->getDriver()->getClient()->getResponse()->getStatus();
+
+      if ($response == 200){
+        $username = $github_profile_page->find('css', '.vcard-username')->getText();
+
+        // Write to local file
+        file_put_contents('/var/hubdrop/.users/' . $uid, $username);
+        return $username;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    else {
+      return FALSE;
+    }
+  }
 }
 
 
