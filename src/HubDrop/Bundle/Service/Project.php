@@ -37,6 +37,11 @@ class Project {
   // The current source of this project. (drupal or github)
   public $source= '';
 
+  // GitHub committers
+  public $committers = array();
+
+  // GitHub admins
+  public $admins = array();
 
   // @TODO: Move to HubDrop service and use service parameters to store default.
   // These are really a part of the larger HubDrop service, but I
@@ -99,6 +104,31 @@ class Project {
       }
       else {
         $this->source = 'github';
+      }
+
+      // Get maintainers
+      $config = $this->exec('git config -l');
+      $config = explode("\n", $config);
+
+      foreach ($config as $line){
+        if (strpos($line, "hubdrop.committers") === 0){
+          list($name, $value) = explode("=", $line);
+          $names = explode('.', $name);
+          $username = array_pop($names);
+          $this->committers[$value] = array(
+            'username' => $username,
+            'uid' => $value,
+          );
+        }
+        if (strpos($line, "hubdrop.admins") === 0){
+          list($name, $value) = explode("=", $line);
+          $names = explode('.', $name);
+          $username = array_pop($names);
+          $this->admins[$value] = array(
+            'username' => $username,
+            'uid' => $value,
+          );
+        }
       }
     }
     // If it is not cloned locally...
@@ -424,11 +454,11 @@ class Project {
     $members = array();
     $admins = array();
     foreach ($users as $uid => $user) {
-      if (!empty($user['github_username'])){
-        $members[] = $user['github_username'];
+      if (!empty($user['github_username']) && !empty($user['write'])){
+        $members[$user['uid']] = $user['github_username'];
       }
       if (!empty($user['github_username']) && !empty($user['administer'])){
-        $admins[] = $user['github_username'];
+        $admins[$user['uid']] = $user['github_username'];
       }
     }
 
@@ -456,6 +486,17 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id = $team['id'];
     }
+    // If team is found, remove all members.
+    else {
+      // Committers
+      $team_members = $client->api('teams')->members($team_id);
+      foreach ($team_members as $member){
+        $client->api('teams')->removeMember($team_id, $member['login']);
+      }
+      $this->exec("git config --remove-section hubdrop.committers");
+    }
+
+    // If admin team not found... create them.
     if (empty($team_id_admin)){
 
       // Create admin team
@@ -469,29 +510,24 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id_admin = $team['id'];
     }
-
-    // If team does exist, remove all members
-    if (!empty($team_id)){
-      // Committers
-      $team_members = $client->api('teams')->members($team_id);
-      foreach ($team_members as $member){
-        $client->api('teams')->removeMember($team_id, $member['login']);
-      }
-    }
-    if (!empty($team_id_admin)){
+    // If team is found, remove all members.
+    else {
       // Admins
       $team_members = $client->api('teams')->members($team_id_admin);
       foreach ($team_members as $member){
         $client->api('teams')->removeMember($team_id_admin, $member['login']);
       }
+      $this->exec("git config --remove-section hubdrop.admins");
     }
 
     // 3. Add all drupal maintainers to Push team, all admins to admin team
-    foreach ($members as $member){
+    foreach ($members as $uid => $member){
       $client->api('teams')->addMember($team_id, $member);
+      $this->exec("git config --add hubdrop.committers.$member $uid");
     }
-    foreach ($admins as $member){
+    foreach ($admins as $uid => $member){
       $client->api('teams')->addMember($team_id_admin, $member);
+      $this->exec("git config --add hubdrop.admins.$member $uid");
     }
   }
 
