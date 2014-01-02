@@ -367,13 +367,34 @@ class Project {
     $this->cloned = TRUE;
 
     $this->setSource('drupal');
+  }
+
+  /**
+   * Update GitHub.com project maintainers.
+   */
+  public function updateMaintainers(){
+    // 0. Prepare GitHubClient
+    $client = new GithubClient();
+    $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
+
+    // 1. Lookup maintainers from drupal.org
+    $data = $this->getMaintainers();
+
+    // 2. Check for github team. If doesn't exist, create it.
+    // @TODO: move team creation to $this->createRepo()
+    $teams = $client->api('teams')->get();
+//    print_r($teams);
+
+    // 3. Add to push/pull team.
+
+    // 4. Add to admin team.
 
   }
 
   /**
    * Logs into drupal.org with the password located at /etc/hubdrop_drupal_pass
    */
-  public function getMaintainers(){
+  private function getMaintainers(){
     $name = $this->name;
 
     // Throw exception if we haven't cloned it yet.
@@ -457,27 +478,13 @@ class Project {
         }
       }
     }
-
-    // @TODO: Find GitHub Usernames
-    foreach ($data as $uid => $perms){
-      if (file_exists('/var/hubdrop/.users/' . $uid)){
-
-      }
-    }
-
-    print_r($data);
     return $data;
-
   }
-
-  /**
-   * @TODO: updateMaintainers() method.
-   */
 
   /**
    * Get a maintainer's github username and save it.
    */
-  public function getGithubAccount($uid){
+  private function getGithubAccount($uid){
 
     // Get a Mink object
     require_once "mink.phar";
@@ -517,6 +524,11 @@ class Project {
       return FALSE;
     }
   }
+
+  /**
+   * @TODO: updateMaintainers() method.
+   */
+
 }
 
 
