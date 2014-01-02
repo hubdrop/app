@@ -379,11 +379,18 @@ class Project {
 
     $name = $this->name;
 
-    // 1. Check for github team. If doesn't exist, create it.
-    // @TODO: move team creation to $this->createRepo()?
-    $response = $client->getHttpClient()->get('/orgs/' . $this->github_organization . '/teams');
-    $teams = \Github\HttpClient\Message\ResponseMediator::getContent($response);
+    // 1. Lookup maintainers from drupal.org
+    $members = array();
+    $users = $this->getMaintainers();
+    foreach ($users as $uid => $user) {
+      if (!empty($user['github_username'])){
+        $members[] = $user['github_username'];
+      }
+    }
 
+    // 2. Check for github team. If doesn't exist, create it.
+    // @TODO: move team creation to $this->createRepo()?
+    $teams = $client->api('teams')->all($this->github_organization);
     foreach ($teams as $team){
       if ($team['name'] == "$name committers"){
         $team_id = $team['id'];
@@ -400,21 +407,21 @@ class Project {
           "$this->github_organization/$name",
         ),
       );
-      $response = $client->getHttpClient()->post('/orgs/' . $this->github_organization . '/teams', $vars);
-
-      $team = \Github\HttpClient\Message\ResponseMediator::getContent($response);
+      $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id = $team['id'];
     }
+    // If team does exist, remove all members
+    else {
+      $team_members = $client->api('teams')->members($team_id);
+      foreach ($team_members as $member){
+        $client->api('teams')->addMember($team_id, $member['login']);
+      }
+    }
 
-    // 2. Lookup maintainers from drupal.org
-    $data = $this->getMaintainers();
-    print_r($data);
-
-//    // 3. Remove all existing maintainers, then add to push/pull team.
-//    $response = $client->getHttpClient()->get('/teams/' . $eam_id . '/members', $vars);
-//    $members = \Github\HttpClient\Message\ResponseMediator::getContent($response);
-//
-//    print_r($members);
+    // 3. Add all drupal maintainers to Push team.
+    foreach ($members as $member){
+      $client->api('teams')->addMember($team_id, $member);
+    }
 
     // 4. Add to admin team.
 
@@ -431,7 +438,6 @@ class Project {
     }
 
     // Get a Mink object
-//    require_once "mink.phar";
     $mink = new \Behat\Mink\Mink(array(
       'hubdrop' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
     ));
@@ -458,7 +464,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the drupal.org project maintainsers.');
+      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the drupal.org project maintainers.');
     }
 
     // Click "Maintainers"
@@ -515,16 +521,40 @@ class Project {
   private function getGithubAccount($uid){
 
     // Get a Mink object
-    require_once "mink.phar";
     $mink = new \Behat\Mink\Mink(array(
       'hubdrop_user' => new  \Behat\Mink\Session(new \Behat\Mink\Driver\GoutteDriver(new \Behat\Mink\Driver\Goutte\Client)),
     ));
 
     // Load the developer's page.
     $mink->setDefaultSessionName('hubdrop_user');
-    $mink->getSession()->visit("http://drupal.org/user/$uid");
+
+    // Visit the project page, then click "Log in / Register"
+    $mink->getSession()->visit("http://drupal.org");
+    $login_link = $mink->getSession()->getPage()->findLink('Log in / Register');
+
+    // If login link is present, login
+    // We are logging in to try to get the latest user profile pae.
+    // Drupal.org's caching delays changes to profiles.
+    if ($login_link){
+      $login_link->click();
+
+      // Fill out the login form and click "Log in"
+      $page = $mink->getSession()->getPage();
+
+      $username = 'hubdrop';
+      $password = file_get_contents('/etc/hubdrop_drupal_pass');
+
+      $el = $page->find('css', '#edit-name');
+      $el->setValue($username);
+
+      $el = $page->find('css', '#edit-pass');
+      $el->setValue($password);
+
+      $page->findButton('Log in')->click();
+    }
 
     // Look for a link to a github profile
+    $mink->getSession()->visit("http://drupal.org/user/$uid");
     $github_profile_link = $mink->getSession()->getPage()->find('xpath', '//a[contains(@href, "github.com")]');
 
     // If there is a link, click it to make sure the user exists.
