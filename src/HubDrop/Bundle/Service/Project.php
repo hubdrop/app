@@ -266,6 +266,25 @@ class Project {
     foreach ($cmds as $cmd){
       exec($cmd);
     }
+
+    // If the source USED to be github but is now Drupal, delete all teams
+    if ($source == 'drupal' && $this->source == 'github'){
+      $client = new GithubClient();
+      $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
+
+      $name = $this->name;
+      $teams = $client->api('teams')->all($this->github_organization);
+      foreach ($teams as $team){
+        if ($team['name'] == "$name committers" || $team['name'] == "$name administrators"){
+          $client->api('teams')->remove($team['id']);
+        }
+      }
+    }
+
+    // If the source USED to be drupal but is now github, create all teams
+    if ($source == 'github' && $this->source == 'drupal'){
+      $this->updateMaintainers();
+    }
   }
 
   /**
@@ -585,26 +604,29 @@ class Project {
     $mink->getSession()->visit("http://drupal.org");
     $login_link = $mink->getSession()->getPage()->findLink('Log in / Register');
 
-    // If login link is present, login
-    // We are logging in to try to get the latest user profile pae.
-    // Drupal.org's caching delays changes to profiles.
-    if ($login_link){
-      $login_link->click();
+    // @TODO: figure out how to initiate one session so we only have to login once.
+    // This is really slow
 
-      // Fill out the login form and click "Log in"
-      $page = $mink->getSession()->getPage();
-
-      $username = 'hubdrop';
-      $password = file_get_contents('/etc/hubdrop_drupal_pass');
-
-      $el = $page->find('css', '#edit-name');
-      $el->setValue($username);
-
-      $el = $page->find('css', '#edit-pass');
-      $el->setValue($password);
-
-      $page->findButton('Log in')->click();
-    }
+//    // If login link is present, login
+//    // We are logging in to try to get the latest user profile pae.
+//    // Drupal.org's caching delays changes to profiles.
+//    if ($login_link){
+//      $login_link->click();
+//
+//      // Fill out the login form and click "Log in"
+//      $page = $mink->getSession()->getPage();
+//
+//      $username = 'hubdrop';
+//      $password = file_get_contents('/etc/hubdrop_drupal_pass');
+//
+//      $el = $page->find('css', '#edit-name');
+//      $el->setValue($username);
+//
+//      $el = $page->find('css', '#edit-pass');
+//      $el->setValue($password);
+//
+//      $page->findButton('Log in')->click();
+//    }
 
     // Look for a link to a github profile
     $mink->getSession()->visit("http://drupal.org/user/$uid");
