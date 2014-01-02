@@ -379,26 +379,32 @@ class Project {
 
     $name = $this->name;
 
-    // 1. Lookup maintainers from drupal.org
-    $members = array();
+    // 1. Lookup maintainers and admins from drupal.org
     $users = $this->getMaintainers();
+    $members = array();
+    $admins = array();
     foreach ($users as $uid => $user) {
       if (!empty($user['github_username'])){
         $members[] = $user['github_username'];
       }
+      if (!empty($user['administer'])){
+        $admins[] = $user['github_username'];
+      }
     }
 
-    // 2. Check for github team. If doesn't exist, create it.
+    // 2. Check for github teams. If doesn't exist, create it.
     // @TODO: move team creation to $this->createRepo()?
     $teams = $client->api('teams')->all($this->github_organization);
     foreach ($teams as $team){
       if ($team['name'] == "$name committers"){
         $team_id = $team['id'];
-        break;
+      }
+      elseif ($team['name'] == "$name administrators"){
+        $team_id_admin = $team['id'];
       }
     }
 
-    // If team not found... create one.
+    // If team not found... create them.
     if (empty($team_id)){
       $vars = array(
         "name" => "$name committers",
@@ -410,21 +416,41 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id = $team['id'];
     }
+    if (empty($team_id_admin)){
+
+      // Create admin team
+      $vars = array(
+        "name" => "$name administrators",
+        "permission" => "admin",
+        "repo_names" => array(
+          "$this->github_organization/$name",
+        ),
+      );
+      $team = $client->api('teams')->create($this->github_organization, $vars);
+      $team_id_admin = $team['id'];
+    }
     // If team does exist, remove all members
     else {
+      // Committers
       $team_members = $client->api('teams')->members($team_id);
       foreach ($team_members as $member){
         $client->api('teams')->addMember($team_id, $member['login']);
       }
+
+      // Admins
+      $team_members = $client->api('teams')->members($team_id_admin);
+      foreach ($team_members as $member){
+        $client->api('teams')->addMember($team_id_admin, $member['login']);
+      }
     }
 
-    // 3. Add all drupal maintainers to Push team.
+    // 3. Add all drupal maintainers to Push team, all admins to admin team
     foreach ($members as $member){
       $client->api('teams')->addMember($team_id, $member);
     }
-
-    // 4. Add to admin team.
-
+    foreach ($admins as $member){
+      $client->api('teams')->addMember($team_id_admin, $member);
+    }
   }
 
   /**
