@@ -188,7 +188,7 @@ class PhpDumper extends Dumper
      */
     private function addProxyClasses()
     {
-        /* @var $proxyDefinitions Definition[] */
+        /* @var $definitions Definition[] */
         $definitions = array_filter(
             $this->container->getDefinitions(),
             array($this->getProxyDumper(), 'isProxyCandidate')
@@ -722,8 +722,6 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 $bagClass
 
 /**
