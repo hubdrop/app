@@ -282,10 +282,10 @@ class Project {
   /**
    * Sets the remote source to drupal or github.
    */
-  public function setSource($source){
+  public function setSource($source, $update_maintainers = FALSE){
 
     // If the source USED to be drupal but is now github, create all teams
-    if ($source == 'github' && $this->source == 'drupal'){
+    if ($source == 'github' && $this->source == 'drupal' && $update_maintainers){
       $this->updateMaintainers();
     }
 
