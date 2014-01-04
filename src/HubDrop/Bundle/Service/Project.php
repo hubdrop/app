@@ -283,18 +283,10 @@ class Project {
    * Sets the remote source to drupal or github.
    */
   public function setSource($source){
-    $cmds = array();
-    chdir($this->getUrl('localhost', 'path'));
-    if ($source == 'github'){
-      $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
-      $cmds[] = "git remote set-url origin " . $this->getUrl('github', 'ssh');
-    }
-    elseif ($source == 'drupal') {
-      $cmds[] = "git remote set-url --push origin " . $this->getUrl('github', 'ssh');
-      $cmds[] = "git remote set-url origin " . $this->getUrl('drupal', 'http');
-    }
-    foreach ($cmds as $cmd){
-      exec($cmd);
+
+    // If the source USED to be drupal but is now github, create all teams
+    if ($source == 'github' && $this->source == 'drupal'){
+      $this->updateMaintainers();
     }
 
     // If the source USED to be github but is now Drupal, delete all teams
@@ -311,9 +303,19 @@ class Project {
       }
     }
 
-    // If the source USED to be drupal but is now github, create all teams
-    if ($source == 'github' && $this->source == 'drupal'){
-      $this->updateMaintainers();
+    // Change the remote URLs
+    $cmds = array();
+    chdir($this->getUrl('localhost', 'path'));
+    if ($source == 'github'){
+      $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
+      $cmds[] = "git remote set-url origin " . $this->getUrl('github', 'ssh');
+    }
+    elseif ($source == 'drupal') {
+      $cmds[] = "git remote set-url --push origin " . $this->getUrl('github', 'ssh');
+      $cmds[] = "git remote set-url origin " . $this->getUrl('drupal', 'http');
+    }
+    foreach ($cmds as $cmd){
+      exec($cmd);
     }
   }
 
@@ -453,6 +455,10 @@ class Project {
     $users = $this->getMaintainers();
     $members = array();
     $admins = array();
+
+    $members_github = array();
+    $admins_github = array();
+
     foreach ($users as $uid => $user) {
       if (!empty($user['github_username']) && !empty($user['write'])){
         $members[$user['uid']] = $user['github_username'];
@@ -491,9 +497,14 @@ class Project {
       // Committers
       $team_members = $client->api('teams')->members($team_id);
       foreach ($team_members as $member){
-        $client->api('teams')->removeMember($team_id, $member['login']);
+        $members_github[] = $member['login'];
+
+        // Remove the member only if they are not committers
+        if (!in_array($member['login'], $members)){
+          $client->api('teams')->removeMember($team_id, $member['login']);
+          $this->exec("git config --remove-section hubdrop.committers." . $member['login']);
+        }
       }
-      $this->exec("git config --remove-section hubdrop.committers");
     }
 
     // If admin team not found... create them.
@@ -515,19 +526,26 @@ class Project {
       // Admins
       $team_members = $client->api('teams')->members($team_id_admin);
       foreach ($team_members as $member){
-        $client->api('teams')->removeMember($team_id_admin, $member['login']);
+        $admins_github[] = $member['login'];
+        if (!in_array($member['login'], $admins)){
+          $client->api('teams')->removeMember($team_id_admin, $member['login']);
+          $this->exec("git config --remove-section hubdrop.admins." . $member['login']);
+        }
       }
-      $this->exec("git config --remove-section hubdrop.admins");
     }
 
     // 3. Add all drupal maintainers to Push team, all admins to admin team
     foreach ($members as $uid => $member){
-      $client->api('teams')->addMember($team_id, $member);
-      $this->exec("git config --add hubdrop.committers.$member $uid");
+      if (!in_array($member, $members_github)){
+        $client->api('teams')->addMember($team_id, $member);
+        $this->exec("git config --add hubdrop.committers.$member $uid");
+      }
     }
     foreach ($admins as $uid => $member){
-      $client->api('teams')->addMember($team_id_admin, $member);
-      $this->exec("git config --add hubdrop.admins.$member $uid");
+      if (!in_array($member, $admins_github)){
+        $client->api('teams')->addMember($team_id_admin, $member);
+        $this->exec("git config --add hubdrop.admins.$member $uid");
+      }
     }
   }
 
@@ -572,7 +590,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the drupal.org project maintainers.');
+      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
     }
 
     // Click "Maintainers"
