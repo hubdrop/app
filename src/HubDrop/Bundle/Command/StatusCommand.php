@@ -2,12 +2,10 @@
 namespace HubDrop\Bundle\Command;
 
 //use HubDrop\Bundle\Service\HubDrop;
-use HubDrop\Bundle\Service\Project;
 use Guzzle\Service\Command\LocationVisitor\Request;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class StatusCommand extends ContainerAwareCommand
@@ -49,20 +47,11 @@ class StatusCommand extends ContainerAwareCommand
     // Load a project
     $project = $hubdrop->getProject($project_name);
 
-    // Check all http urls
-    foreach ($project->urls as $remote => $urls){
-      if (isset($urls['web'])){
-        $web = $urls['web'];
-        if ($project->checkUrl($remote)){
-          $out[] = "<info>[FOUND]</info> $remote site exists at $web";
-        }
-        else {
-          $out[] = "<comment>[NOT FOUND]</comment> $remote site not found at $web";
-        }
-      }
-    }
+    // Check status.
+    $project->checkStatus();
+    $messages = $project->session->getFlashBag()->get('info');
 
     // @TODO: Setup proper exit code stuff.
-    $output->writeln($out);
+    $output->writeln($messages);
   }
 }

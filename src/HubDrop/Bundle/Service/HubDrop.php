@@ -7,9 +7,19 @@
  */
 namespace HubDrop\Bundle\Service;
 
-use HubDrop\Bundle\Service\Project;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class HubDrop {
+
+  public function __construct($github_organization, $drupal_username, Router $router, Session $session)
+  {
+    $this->github_organization = $github_organization;
+    $this->drupal_username = $drupal_username;
+
+    $this->router = $router;
+    $this->session = $session;
+  }
 
  /**
   * @TODO: Use a SERVER variable (or something) for these.
@@ -32,8 +42,8 @@ class HubDrop {
   /**
    * Get a Project Object
    */
-  public function getProject($name, $check = FALSE){
-     return new Project($name, $check);
+  public function getProject($name){
+     return new Project($name, $this->session);
   }
 
   /**

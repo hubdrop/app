@@ -14,6 +14,7 @@ use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+
 class Project {
 
   // The drupal project we want to deal with.
@@ -59,7 +60,10 @@ class Project {
   /**
    * Initiate the project
    */
-  public function __construct($name) {
+  public function __construct($name, Session $session) {
+
+    $this->session = $session;
+
     // Set properties
     // @TODO: Un-hardcode these properties.
     $this->name = $name = strtolower($name);
@@ -720,6 +724,23 @@ class Project {
     return shell_exec($cmd);
   }
 
+  /**
+   * Check Status
+   */
+  public function checkStatus(){
+    // Check all http urls
+    foreach ($this->urls as $remote => $urls){
+      if (isset($urls['web'])){
+        $web = $urls['web'];
+        if ($this->checkUrl($remote)){
+          $this->session->getFlashBag()->add('info', "$remote site exists at $web");
+        }
+        else {
+          $this->session->getFlashBag()->add('info', "$remote site not found at $web");
+        }
+      }
+    }
+  }
 }
 
 

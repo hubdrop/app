@@ -6,4 +6,4 @@ parameters:
 services:
   hubdrop:
     class:        "%hubdrop.class%"
-    arguments: ["%hubdrop.github_organization%", "%hubdrop.drupal_username%"]
+    arguments: ["%hubdrop.github_organization%", "%hubdrop.drupal_username%", @router, @session]
