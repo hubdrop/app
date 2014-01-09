@@ -12,45 +12,51 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class HubDrop {
 
-  public function __construct($github_organization, $drupal_username, Router $router, Session $session)
+  public function __construct($github_username, $github_organization, $drupal_username, $hubdrop_url, Router $router, Session $session)
   {
+//    // Get application token form /etc/github_application_token
+//    if (!file_exists('/etc/github_application_token')){
+//      throw new \Exception('GitHub Application Token not found at /etc/github_application_token. Run hubdrop github-token <github_username>');
+//    }
+
+    if (file_exists('/etc/github_application_token')){
+      $this->github_application_token = file_get_contents('/etc/github_application_token');
+    }
+
+    $this->github_username = $github_username;
     $this->github_organization = $github_organization;
     $this->drupal_username = $drupal_username;
+    $this->hubdrop_url = $hubdrop_url;
 
     $this->router = $router;
     $this->session = $session;
   }
 
- /**
-  * @TODO: Use a SERVER variable (or something) for these.
-  *
-  * These should originate as Chef attributes, and percolate through as
-  * Symfony app config.
-  */
-  public $hubdrop_url = 'http://hubdrop.io';
-  public $github_organization = 'drupalprojects';
-  public $repo_path = '/var/hubdrop/repos';
+  // HubDrop Attributes.  @see \src\HubDrop\Bundle\Resources\config\services.yml
+  private $github_organization;
+  private $drupal_username;
+  private $hubdrop_url;
 
-  /**
-   * This was retrieved using a github username and password with curl:
-   * curl -i -u <github_username> -d '{"scopes": ["repo"]}' https://api.github.com/authorizations
-   * @TODO: We should generate a new key in the chef cookbooks, as a
-   * part of the vagrant up/deployment process.
-   */
-  private $github_application_token = '2f3a787bc2881ac86d0277b37c1b9a67c4c509bb';
+  private $github_application_token;
+
+  private $router;
+  private $session;
+
+//  public $repo_path = '/var/hubdrop/repos';
 
   /**
    * Get a Project Object
    */
   public function getProject($name){
-     return new Project($name, $this->session);
-  }
-
-  /**
-   * Get a GitHub Token
-   */
-  private function getGitHubToken(){
-    return $this->github_application_token;
+     return new Project(
+       $name,
+       $this->github_organization,
+       $this->drupal_username,
+       $this->hubdrop_url,
+       $this->github_application_token,
+       $this->router,
+       $this->session
+     );
   }
 
   /**
@@ -60,7 +66,7 @@ class HubDrop {
 
     // Lookup all repositories for this github organization.
     $client = new \Github\Client();
-    $client->authenticate($this->getGitHubToken(), '', \GitHub\Client::AUTH_URL_TOKEN);
+    $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
 
     try {
       $api = $client->api('organization');

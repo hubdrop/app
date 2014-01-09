@@ -10,7 +10,9 @@ namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
 use Guzzle\Http\Client as GuzzleClient;
+
 use Guzzle\Http\Exception\BadResponseException;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -44,24 +46,31 @@ class Project {
   // GitHub admins
   public $admins = array();
 
-  // @TODO: Move to HubDrop service and use service parameters to store default.
-  // These are really a part of the larger HubDrop service, but I
-  // haven't learned how to access that from a Project class yet!
-  private $github_organization = 'drupalprojects';
-
-  /**
-   * This was retrieved using a github username and password with curl:
-   * curl -i -u <github_username> -d '{"scopes": ["repo"]}' https://api.github.com/authorizations
-   * @TODO: We should generate a new key in the chef cookbooks, as a
-   * part of the vagrant up/deployment process.
-   */
-  private $github_application_token = '2f3a787bc2881ac86d0277b37c1b9a67c4c509bb';
+  // HubDrop service parameters
+  private $github_organization = '';
+  private $drupal_username = '';
+  private $github_application_token = '';
 
   /**
    * Initiate the project
    */
-  public function __construct($name, Session $session) {
+  public function __construct(
+    $name,
+    $github_organization,
+    $drupal_username,
+    $hubdrop_url,
+    $github_application_token,
+    Router $router,
+    Session $session
+  ) {
 
+    $this->github_organization = $github_organization;
+    $this->drupal_username = $drupal_username;
+    $this->hubdrop_url = $hubdrop_url;
+
+    $this->github_application_token = $github_application_token;
+
+    $this->router = $router;
     $this->session = $session;
 
     // Set properties
@@ -70,16 +79,16 @@ class Project {
     $this->urls = array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/$name",
-        'ssh' => "hubdrop@git.drupal.org:project/$name.git",
+        'ssh' => "$drupal_username@git.drupal.org:project/$name.git",
         'http' => "http://git.drupal.org/project/$name.git",
       ),
       'github' => array(
-        'web' => "http://github.com/drupalprojects/$name",
-        'ssh' => "git@github.com:drupalprojects/$name.git",
+        'web' => "http://github.com/$github_organization/$name",
+        'ssh' => "git@github.com:$github_organization/$name.git",
         'http' =>  "https://github.com/project/$name.git",
       ),
       'hubdrop' => array(
-        'web' => "http://hubdrop.io/project/$name",
+        'web' => "$hubdrop_url/project/$name",
       ),
       'localhost' => array(
         'path' => "/var/hubdrop/repos/$name.git",

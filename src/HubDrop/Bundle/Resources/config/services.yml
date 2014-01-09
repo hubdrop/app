@@ -1,9 +1,11 @@
 parameters:
   hubdrop.class:  HubDrop\Bundle\Service\HubDrop
   hubdrop.github_organization: 'drupalprojects'
+  hubdrop.github_username: 'hubdrop-user'
   hubdrop.drupal_username: 'hubdrop'
+  hubdrop.url: 'http://hubdrop.io'
 
 services:
   hubdrop:
     class:        "%hubdrop.class%"
-    arguments: ["%hubdrop.github_organization%", "%hubdrop.drupal_username%", @router, @session]
+    arguments: ["%hubdrop.github_username%", "%hubdrop.github_organization%", "%hubdrop.drupal_username%", "%hubdrop.url%", @router, @session]
