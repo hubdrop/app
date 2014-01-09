@@ -442,8 +442,13 @@ class Project {
     $client = $this->hubdrop->getGithubClient();
     $name = $this->name;
 
-    // 1. Lookup maintainers and admins from drupal.org
-    $users = $this->getMaintainers();
+    try {
+      // 1. Lookup maintainers and admins from drupal.org
+      $users = $this->getMaintainers();
+    } catch (NonMaintainerException $e) {
+      return;
+    }
+
     $members = array();
     $admins = array();
 
@@ -581,7 +586,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new AccessDeniedHttpException('Unable to access project maintainers list. Have someone add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
+      throw new NonMaintainerException('Unable to access project maintainers list. Have someone add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
     }
 
     // Click "Maintainers"
@@ -731,5 +736,6 @@ class Project {
 }
 
 
+class NonMaintainerException extends \Exception { }
 class NoProjectException extends \Exception { }
 class NotClonedException extends \Exception { }
