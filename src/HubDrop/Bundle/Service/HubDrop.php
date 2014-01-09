@@ -14,10 +14,6 @@ class HubDrop {
 
   public function __construct($github_username, $github_organization, $drupal_username, $hubdrop_url, Router $router, Session $session)
   {
-//    // Get application token form /etc/github_application_token
-//    if (!file_exists('/etc/github_application_token')){
-//      throw new \Exception('GitHub Application Token not found at /etc/github_application_token. Run hubdrop github-token <github_username>');
-//    }
 
     if (file_exists('/etc/github_application_token')){
       $this->github_application_token = file_get_contents('/etc/github_application_token');

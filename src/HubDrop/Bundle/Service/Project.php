@@ -9,8 +9,8 @@
 namespace HubDrop\Bundle\Service;
 
 use Github\Client as GithubClient;
-use Guzzle\Http\Client as GuzzleClient;
 
+use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -63,6 +63,12 @@ class Project {
     Router $router,
     Session $session
   ) {
+
+    // token is missing, throw exception.
+    if (empty($github_application_token)){
+      throw new \Exception('GitHub Token not found.  Run command "hubdrop github_auth"');
+    }
+
 
     $this->github_organization = $github_organization;
     $this->drupal_username = $drupal_username;
@@ -304,6 +310,7 @@ class Project {
 
     // If the source USED to be github but is now Drupal, delete all teams
     if ($source == 'drupal' && $this->source == 'github'){
+
       $client = new GithubClient();
       $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
 
