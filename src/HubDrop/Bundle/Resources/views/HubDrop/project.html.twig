@@ -18,44 +18,46 @@
 
       {% if project.exists %}
       <section class="container"><div class="row">
-
-        <div id="action" class="col-sm-12"">
-          <div id="mirror-status" class="text-center">
-              <img src="/img/druplicon.png">
-              {% if project.mirrored %}
-                  <span class="glyphicon glyphicon-transfer"></span>
-              {% else %}
-                  {%  if project.mirrored == FALSE and allow_mirroring %}
-                      <a href='?mirror=go' class="btn btn-success btn-lg" id="mirror-button"><span class="glyphicon glyphicon-transfer"></span><br /> Mirror On GitHub</a>
-                  {%  else  %}
-                      <a href='#' class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-transfer"></span><br /> Mirroring disabled</a>
-                  {%  endif %}
-              {%  endif %}
-              <img src="/img/github-mark.png">
-          </div>
-          <p class="text-muted text-center">
-              {% if project.mirrored %}
-              <small>Now Mirroring</small>
-              {% else %}
-              <small>Click the Big Green Button above to mirror this project on GitHub.</small>
-              {% endif %}
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div id="drupal-info" class="col-sm-6 small">
+        <div id="drupal-info" class="col-sm-5 small">
           <div class="panel panel-info">
+              <div class="panel-heading text-center">
+                  <img src="/img/druplicon.png">
+              </div>
             <div class="list-group">
-                <a href="{{ urls.drupal.web }}" class="list-group-item">{{ urls.drupal.web }}</a>
+                <a href="{{ urls.drupal.web }}" class="list-group-item" title="Visit {{ urls.github.web }}">Project Page</a>
                 <span class="list-group-item">
                     <input class="form-control" value="git clone {{ urls.drupal.http }}" onclick="this.select()"/>
                 </span>
             </div>
           </div>
         </div>
-        <div id="github-info" class="col-sm-6 small"><div class="panel panel-info">
+        <div id="direction-info" class="col-sm-2 small text-center">
+            {% if project.mirrored %}
+                {% if project.source == 'github' %}
+                    <span class="glyphicon glyphicon-arrow-left text-success "></span>
+                    <p class="text-success text-center">
+                        Code moves from GitHub to Drupal.
+                    </p>
+                {%  else %}
+                    <span class="glyphicon glyphicon-arrow-right text-info "></span>
+                    <p class="text-info text-center">
+                        Code moves from Drupal to GitHub.
+                    </p>
+                {% endif %}
+            {% else %}
+                {%  if project.mirrored == FALSE and allow_mirroring %}
+                    <a href='?mirror=go' class="btn btn-success btn-lg" id="mirror-button"><span class="glyphicon glyphicon-transfer"></span><br /> Mirror On GitHub</a>
+                {%  else  %}
+                    <a href='#' class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-transfer"></span><br /> Mirroring disabled</a>
+                {%  endif %}
+            {%  endif %}
+        </div>
+        <div id="github-info" class="col-sm-5 small"><div class="panel panel-info">
+            <div class="panel-heading text-center">
+                <img src="/img/github-mark.png">
+            </div>
             <div class="list-group">
-            <a href="{{ urls.github.web }}" class="list-group-item">{% if project.mirrored == false %}<strike>{% endif %}{{ urls.github.web }}{% if project.mirrored == false %}</strike>{% endif %}</a>
+            <a href="{{ urls.github.web }}" class="list-group-item" title="Visit {{ urls.github.web }}">{% if project.mirrored == false %}<strike>{% endif %}Repo Page{% if project.mirrored == false %}</strike>{% endif %}</a>
             <span class="list-group-item">
             <input class="form-control" value="git clone {{ urls.github.http }}" onclick="this.select()" {% if project.mirrored == false %}disabled="disabled"{% endif %}/>
             </span>
@@ -72,11 +74,7 @@
             This module is mirrored on GitHub.  It is updated every minute, approximately.
         </p>
       {%  endif %}
-      {% if project.source == 'github' %}
-        <p class="text-success text-center">
-          The source for this module lives on GitHub.
-        </p>
-      {% endif %}
+
 
         {% if project.committers %}
             <h3>GitHub Maintainers</h3>
