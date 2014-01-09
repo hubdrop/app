@@ -15,8 +15,14 @@ $loader->register(true);
 
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';
-
-$kernel = new AppKernel('prod', false);
+if ($_SERVER['http_host'] == 'hubdrop.io'){
+  $env = 'prod';
+}
+else {
+  $env = 'dev';
+}
+$kernel = new AppKernel($env, false);
+//print 'yep. dev';
 $kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 $request = Request::createFromGlobals();
