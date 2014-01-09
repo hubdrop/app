@@ -49,7 +49,7 @@ class StatusCommand extends ContainerAwareCommand
 
     // Check status.
     $project->checkStatus();
-    $messages = $project->session->getFlashBag()->get('info');
+    $messages = $hubdrop->session->getFlashBag()->get('info');
 
     // @TODO: Setup proper exit code stuff.
     $output->writeln($messages);

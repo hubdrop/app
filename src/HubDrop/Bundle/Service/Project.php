@@ -8,8 +8,6 @@
  */
 namespace HubDrop\Bundle\Service;
 
-use Github\Client as GithubClient;
-
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -38,7 +36,7 @@ class Project {
   public $default_branch = '';
 
   // The current source of this project. (drupal or github)
-  public $source= '';
+  public $source = '';
 
   // GitHub committers
   public $committers = array();
@@ -46,58 +44,31 @@ class Project {
   // GitHub admins
   public $admins = array();
 
-  // HubDrop service parameters
-  private $github_organization = '';
-  private $drupal_username = '';
-  private $github_application_token = '';
-
   /**
    * Initiate the project
    */
-  public function __construct(
-    $name,
-    $github_organization,
-    $drupal_username,
-    $hubdrop_url,
-    $github_application_token,
-    Router $router,
-    Session $session
-  ) {
-
-    // token is missing, throw exception.
-    if (empty($github_application_token)){
-      throw new \Exception('GitHub Token not found.  Run command "hubdrop github_auth"');
-    }
-
-
-    $this->github_organization = $github_organization;
-    $this->drupal_username = $drupal_username;
-    $this->hubdrop_url = $hubdrop_url;
-
-    $this->github_application_token = $github_application_token;
-
-    $this->router = $router;
-    $this->session = $session;
+  public function __construct($name, $hubdrop) {
+    // Make our hubdrop service available to projects.
+    $this->hubdrop = $hubdrop;
 
     // Set properties
-    // @TODO: Un-hardcode these properties.
-    $this->name = $name = strtolower($name);
+    $this->name = $name = strtolower(trim($name));
     $this->urls = array(
       'drupal' => array(
-        'web' =>  "http://drupal.org/project/$name",
-        'ssh' => "$drupal_username@git.drupal.org:project/$name.git",
-        'http' => "http://git.drupal.org/project/$name.git",
+        'web' =>  "http://drupal.org/project/{$this->name}",
+        'ssh' => "{$hubdrop->drupal_username}@git.drupal.org:project/{$this->name}.git",
+        'http' => "http://git.drupal.org/project/{$this->name}.git",
       ),
       'github' => array(
-        'web' => "http://github.com/$github_organization/$name",
-        'ssh' => "git@github.com:$github_organization/$name.git",
-        'http' =>  "https://github.com/project/$name.git",
+        'web' => "http://github.com/{$hubdrop->github_organization}/{$this->name}",
+        'ssh' => "git@github.com:{$hubdrop->github_organization}/{$this->name}.git",
+        'http' =>  "https://github.com/project/{$this->name}.git",
       ),
       'hubdrop' => array(
-        'web' => "$hubdrop_url/project/$name",
+        'web' => "{$hubdrop->url}/project/{$this->name}",
       ),
       'localhost' => array(
-        'path' => "/var/hubdrop/repos/$name.git",
+        'path' => "/var/hubdrop/repos/{$this->name}.git",
       ),
     );
 
@@ -116,14 +87,7 @@ class Project {
       $this->default_branch = $this->getCurrentBranch();
 
       // Get the current source
-      $source = $this->exec('git config --get remote.origin.url');
-
-      if (trim($source) == trim($this->getUrl('drupal', 'http'))){
-        $this->source = 'drupal';
-      }
-      else {
-        $this->source = 'github';
-      }
+      $this->source = $this->checkSource();
 
       // Get maintainers
       $config = $this->exec('git config -l');
@@ -159,6 +123,23 @@ class Project {
       $this->mirrored = $this->exists?
         (bool) $this->checkUrl('github'):
         FALSE;
+    }
+  }
+
+  /**
+   * Gets the current "source" of the mirror.
+   *
+   * @return string
+   *   "drupal" or "github"
+   */
+  public function checkSource() {
+    $source = $this->exec('git config --get remote.origin.url');
+
+    if (trim($source) == trim($this->getUrl('drupal', 'http'))){
+      return 'drupal';
+    }
+    else {
+      return 'github';
     }
   }
 
@@ -310,12 +291,9 @@ class Project {
 
     // If the source USED to be github but is now Drupal, delete all teams
     if ($source == 'drupal' && $this->source == 'github'){
-
-      $client = new GithubClient();
-      $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
-
+      $client = $this->hubdrop->getGitHubClient();
       $name = $this->name;
-      $teams = $client->api('teams')->all($this->github_organization);
+      $teams = $client->api('teams')->all($this->hubdrop->github_organization);
       foreach ($teams as $team){
         if ($team['name'] == "$name committers" || $team['name'] == "$name administrators"){
           $client->api('teams')->remove($team['id']);
@@ -344,14 +322,12 @@ class Project {
    */
   private function createRemote(){
     $name = $this->name;
-    $client = new GithubClient();
-    $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
+    $client = $this->hubdrop->getGitHubClient();
 
     // Create the Repo on GitHub (this can be run by www-data, or any user.)
     try {
       $url = $this->getUrl();
-      $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->getUrl('hubdrop'), true, $this->github_organization);
-      $this->github_repo = $repo;
+      $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->getUrl('hubdrop'), true, $this->hubdrop->github_organization);
     }
     catch (ValidationFailedException $e) {
       // If it already exists, that's ok, but alert the user.
@@ -393,11 +369,8 @@ class Project {
 
     // Set the default branch of a repo.
     try {
-      $client = new GithubClient();
-      $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
-
-      $repo = $client->api('repo')->update($this->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
-      $this->github_repo = $repo;
+      $client = $this->hubdrop->getGithubClient();
+      $repo = $client->api('repo')->update($this->hubdrop->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
     }
     catch (\Github\Exception\ValidationFailedException $e) {
       return FALSE;
@@ -466,9 +439,7 @@ class Project {
    */
   public function updateMaintainers(){
     // 0. Prepare GitHubClient
-    $client = new GithubClient();
-    $client->authenticate($this->github_application_token, '', \GitHub\Client::AUTH_URL_TOKEN);
-
+    $client = $this->hubdrop->getGithubClient();
     $name = $this->name;
 
     // 1. Lookup maintainers and admins from drupal.org
@@ -490,7 +461,7 @@ class Project {
 
     // 2. Check for github teams. If doesn't exist, create it.
     // @TODO: move team creation to $this->createRepo()?
-    $teams = $client->api('teams')->all($this->github_organization);
+    $teams = $client->api('teams')->all($this->hubdrop->github_organization);
     foreach ($teams as $team){
       if ($team['name'] == "$name committers"){
         $team_id = $team['id'];
@@ -506,10 +477,10 @@ class Project {
         "name" => "$name committers",
         "permission" => "push",
         "repo_names" => array(
-          "$this->github_organization/$name",
+          "{$this->hubdrop->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
+      $team = $client->api('teams')->create($this->hubdrop->github_organization, $vars);
       $team_id = $team['id'];
     }
     // If team is found, remove all members.
@@ -535,10 +506,10 @@ class Project {
         "name" => "$name administrators",
         "permission" => "admin",
         "repo_names" => array(
-          "$this->github_organization/$name",
+          "{$this->hubdrop->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
+      $team = $client->api('teams')->create($this->hubdrop->github_organization, $vars);
       $team_id_admin = $team['id'];
     }
     // If team is found, remove all members.
@@ -749,10 +720,10 @@ class Project {
       if (isset($urls['web'])){
         $web = $urls['web'];
         if ($this->checkUrl($remote)){
-          $this->session->getFlashBag()->add('info', "$remote site exists at $web");
+          $this->hubdrop->session->getFlashBag()->add('info', "$remote site exists at $web");
         }
         else {
-          $this->session->getFlashBag()->add('info', "$remote site not found at $web");
+          $this->hubdrop->session->getFlashBag()->add('info', "$remote site not found at $web");
         }
       }
     }
