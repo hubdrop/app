@@ -47,7 +47,7 @@ class Project {
   /**
    * Initiate the project
    */
-  public function __construct($name, $hubdrop) {
+  public function __construct($name, HubDrop $hubdrop) {
     // Make our hubdrop service available to projects.
     $this->hubdrop = $hubdrop;
 

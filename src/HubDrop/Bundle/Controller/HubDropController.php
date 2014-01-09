@@ -52,6 +52,7 @@ class HubDropController extends Controller
     // Build twig vars
     $vars = array();
     $vars['project'] = $project;
+    unset($vars['project']->hubdrop);
 
     // @TODO: Just use project in twig templates
     $vars['project_name'] = $project_name;
