@@ -1,6 +1,6 @@
 imports:
     - { resource: config.yml }
-    - { resource: vagrant.php }
+    - { resource: local.php }
 
 framework:
     router:
@@ -15,6 +15,7 @@ web_profiler:
 monolog:
     handlers:
         main:
+
             type:  stream
             path:  %kernel.logs_dir%/%kernel.environment%.log
             level: debug
