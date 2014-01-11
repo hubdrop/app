@@ -4,9 +4,8 @@
 // but this lets the console read vagrant attributes.json file when developing symfony locally.
 $attributes_path = __DIR__ . '/../../../attributes.json';
 $is_console_server = file_exists($attributes_path);
-$is_vagrant_server = file_exists('/vagrant');
 
-if ($is_console_server || $is_vagrant_server){
+if ($is_console_server){
 
   // Load JSON attributes
   $attributes = json_decode(file_get_contents($is_console_server?  $attributes_path: '/vagrant/attributes.json'));
