@@ -21,7 +21,7 @@ class GetGithubAuthCommand extends ContainerAwareCommand
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    // Get hubdrop service.
+    // Get hubdrop service and github username.
     $hubdrop = $this->getContainer()->get('hubdrop');
     $username = $hubdrop->github_username;
 
@@ -29,14 +29,13 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     $dialog = $this->getHelperSet()->get('dialog');
     $password = $dialog->askHiddenResponse($output, "What is the password for $username on GitHub? ");
 
+    // @TODO: We should lookup existing tokens and display them.
+
     // Generates the token
     $token = $this->generateGitHubToken($username, $password);
 
-    // Write to /etc/github_authorization_key
-    exec("echo $token | sudo tee /etc/github_authorization_key");
-
     // Output to user.
-    $output->writeln("Token written to /etc/github_authorization_key: $token");
+    $output->writeln("Token created: $token");
   }
 
   /**
