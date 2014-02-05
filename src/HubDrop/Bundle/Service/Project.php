@@ -44,6 +44,9 @@ class Project {
   // GitHub admins
   public $admins = array();
 
+  // GitHub Organization
+  public $github_organization = '';
+
   /**
    * Initiate the project
    */
@@ -92,7 +95,6 @@ class Project {
       // Get maintainers
       $config = $this->exec('git config -l');
       $config = explode("\n", $config);
-
       foreach ($config as $line){
         if (strpos($line, "hubdrop.committers") === 0){
           list($name, $value) = explode("=", $line);
@@ -113,6 +115,22 @@ class Project {
           );
         }
       }
+
+      // Get GitHub Organization
+      $remotes = explode("\n", $this->exec('git remote -v'));
+
+      foreach ($remotes as $line){
+        list($remote, $url, $type) = preg_split('/\s+/', $line);
+//        origin	git@github.com:pcgroup/engageny2.git (push)
+        if ($remote == 'origin' && $type == '(push)'){
+          // @TODO: REGEX!
+          $url = str_replace('git@github.com:', 'http://github.com/', $url);
+          $url = parse_url($url);
+          $path = explode('/', $url['path']);
+          $this->github_organization = $path[1];
+          break;
+        }
+      }
     }
     // If it is not cloned locally...
     else {
@@ -123,6 +141,9 @@ class Project {
       $this->mirrored = $this->exists?
         (bool) $this->checkUrl('github'):
         FALSE;
+
+      // Set GitHub Org to match HubDrop
+      $this->github_organization = $this->hubdrop->github_organization;
     }
   }
 
@@ -370,7 +391,7 @@ class Project {
     // Set the default branch of a repo.
     try {
       $client = $this->hubdrop->getGithubClient();
-      $repo = $client->api('repo')->update($this->hubdrop->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
+      $repo = $client->api('repo')->update($this->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
     }
     catch (\Github\Exception\ValidationFailedException $e) {
       return FALSE;
@@ -466,7 +487,7 @@ class Project {
 
     // 2. Check for github teams. If doesn't exist, create it.
     // @TODO: move team creation to $this->createRepo()?
-    $teams = $client->api('teams')->all($this->hubdrop->github_organization);
+    $teams = $client->api('teams')->all($this->github_organization);
     foreach ($teams as $team){
       if ($team['name'] == "$name committers"){
         $team_id = $team['id'];
@@ -482,10 +503,10 @@ class Project {
         "name" => "$name committers",
         "permission" => "push",
         "repo_names" => array(
-          "{$this->hubdrop->github_organization}/{$name}",
+          "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->hubdrop->github_organization, $vars);
+      $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id = $team['id'];
     }
     // If team is found, remove all members.
@@ -511,10 +532,10 @@ class Project {
         "name" => "$name administrators",
         "permission" => "admin",
         "repo_names" => array(
-          "{$this->hubdrop->github_organization}/{$name}",
+          "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->hubdrop->github_organization, $vars);
+      $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id_admin = $team['id'];
     }
     // If team is found, remove all members.
