@@ -16,6 +16,11 @@ before_script:
   - app/console --env=test cache:warmup
   - chmod -R 777 app/cache app/logs
   
+  - export SYMFONY__APP__GITHUB__USERNAME=hubdrop-user
+  - export SYMFONY__APP__GITHUB__ORGANIZATION=drupalprojects
+  - export SYMFONY__APP__GITHUB__AUTHORIZATION=xyz
+  - export SYMFONY__APP__DRUPAL__USERNAME=hubdrop
+  
 script:
   - phpunit -c app src/
   - bin/behat
