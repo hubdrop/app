@@ -10,14 +10,14 @@ before_script:
   - sudo /etc/init.d/apache2 restart
   - echo "127.0.0.1 hubdrop.travis" | sudo tee -a /etc/hosts
   - sudo /etc/init.d/apache2 restart
-#   - app/console do:da:cr -e=test > /dev/null
-#   - app/console do:sc:cr -e=test > /dev/null
-#   - chmod -R 777 app/cache app/logs
-#   - app/console --env=test cache:warmup
-#   - chmod -R 777 app/cache app/logs
+  - app/console do:da:cr -e=test > /dev/null
+  - app/console do:sc:cr -e=test > /dev/null
+  - chmod -R 777 app/cache app/logs
+  - app/console --env=test cache:warmup
+  - chmod -R 777 app/cache app/logs
   
-# script:
-#   - phpunit -c app src/
+script:
+  - phpunit -c app src/
 #   - bin/behat @KnpQABundle
 #   - bin/behat @KnpAnotherBundle
 
