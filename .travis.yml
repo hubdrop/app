@@ -21,6 +21,7 @@ before_script:
 #   - bin/behat @KnpQABundle
 #   - bin/behat @KnpAnotherBundle
 
+
 # configure notifications (email, IRC, campfire etc)
 notifications:
   irc: "irc.freenode.org#hubdrop"
