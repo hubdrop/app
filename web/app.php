@@ -1,5 +1,5 @@
 <?php
-
+print_r($_SERVER);
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\HttpFoundation\Request;
 
