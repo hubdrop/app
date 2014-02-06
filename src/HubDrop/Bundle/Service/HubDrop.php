@@ -25,6 +25,7 @@ class HubDrop {
 
   public $drupal_username;
   public $url;
+  public $repo_path;
 
   /**
    * Symfony router and session.
@@ -50,6 +51,8 @@ class HubDrop {
 
     $this->router = $router;
     $this->session = $session;
+
+    $this->repo_path = '/var/hubdrop/repos';
   }
 
   /**
