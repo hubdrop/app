@@ -6,20 +6,20 @@ php:
 before_script:
   - sudo apt-get update > /dev/null
   - sudo apt-get install -y --force-yes apache2 libapache2-mod-php5 php5-curl php5-mysql php5-intl
-  - sudo sed -i -e "s,/var/www,$(pwd)/web,g" /etc/apache2/sites-available/default
-  - sudo /etc/init.d/apache2 restart
-  - echo "127.0.0.1 hubdrop.travis" | sudo tee -a /etc/hosts
-  - sudo /etc/init.d/apache2 restart
-  - app/console do:da:cr -e=test > /dev/null
-  - app/console do:sc:cr -e=test > /dev/null
-  - chmod -R 777 app/cache app/logs
-  - app/console --env=test cache:warmup
-  - chmod -R 777 app/cache app/logs
+#   - sudo sed -i -e "s,/var/www,$(pwd)/web,g" /etc/apache2/sites-available/default
+#   - sudo /etc/init.d/apache2 restart
+#   - echo "127.0.0.1 hubdrop.travis" | sudo tee -a /etc/hosts
+#   - sudo /etc/init.d/apache2 restart
+#   - app/console do:da:cr -e=test > /dev/null
+#   - app/console do:sc:cr -e=test > /dev/null
+#   - chmod -R 777 app/cache app/logs
+#   - app/console --env=test cache:warmup
+#   - chmod -R 777 app/cache app/logs
   
-script:
-  - phpunit -c app src/
-  - bin/behat @KnpQABundle
-  - bin/behat @KnpAnotherBundle
+# script:
+#   - phpunit -c app src/
+#   - bin/behat @KnpQABundle
+#   - bin/behat @KnpAnotherBundle
 
 # configure notifications (email, IRC, campfire etc)
 notifications:
