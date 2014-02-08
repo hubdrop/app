@@ -12,10 +12,3 @@ parameters:
     mailer_password: null
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
-
-    app:
-        github:
-            username: hubdrop-user
-            organization: drupalprojects
-        drupal:
-            username: hubdrop
