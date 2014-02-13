@@ -4,6 +4,7 @@ namespace HubDrop\Bundle\Command;
 
 use Guzzle\Http\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,38 +21,99 @@ class GetGithubAuthCommand extends ContainerAwareCommand
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-//    // Get hubdrop service and github username.
-//    $hubdrop = $this->getContainer()->get('hubdrop');
-//    $username = $hubdrop->github_username;
-
-    // Get password
+    // Check if authorization already exists
     $dialog = $this->getHelperSet()->get('dialog');
-    $username = $dialog->ask($output, "GitHub Username? ");
-    $password = $dialog->askHiddenResponse($output, "GitHub Password? ");
+    $hubdrop_path_to_github_auth = $this->getContainer()->getParameter('hubdrop.paths.github_authorization');
 
-    // @TODO: We should lookup existing tokens and display them.
-
-    // Generates the key
-    $key = $this->generateGitHubToken($username, $password);
-
-    // Output to user.
-    $output->writeln("Token created: $key");
-
-    // Ask to write to file
-    if ($dialog->askConfirmation(
-      $output,
-      '<question>Write to /etc/hubdrop-github-authorization?</question> ',
-      false
-    )){
-      if (file_put_contents('/etc/hubdrop-github-authorization', $key)){
-        $output->writeln("Wrote to /etc/hubdrop-github-authorization");
+    // Ask to create a new authorization.
+    if (file_exists($hubdrop_path_to_github_auth)){
+      if ($dialog->askConfirmation(
+        $output,
+        "You already have an authorization.  Generate a new one? ",
+        false
+      )){
+        $need_new_code = TRUE;
       }
       else {
-        $output->writeln("Could not write to /etc/hubdrop-github-authorization. Try:");
-        $output->writeln(" sudo hubdrop github_auth");
-        $output->writeln("            -or- ");
-        $output->writeln(" echo '$key' | sudo tee -a /etc/hubdrop-github-authorization");
+        $need_new_code = FALSE;
+        $authorization = file_get_contents($hubdrop_path_to_github_auth);
       }
+    }
+    else {
+      $need_new_code = TRUE;
+    }
+
+    // If need new code...
+    if ($need_new_code){
+      $hubdrop_github_org = $this->getContainer()->getParameter('hubdrop.github_organization');
+      $hubdrop_github_username = $this->getContainer()->getParameter('hubdrop.github_username');
+
+      // Note to user
+      $output->writeln("Enter your credentials to generate a GitHub Authorization token.");
+      $output->writeln("The user must have the ability to create repos in the <comment>$hubdrop_github_org</comment> organization.");
+
+      // Get password
+      $username = $dialog->ask($output, "GitHub Username (default: $hubdrop_github_username)? ", $hubdrop_github_username);
+      $password = $dialog->askHiddenResponse($output, "GitHub Password? ");
+
+      // @TODO: We should lookup existing tokens and display them.
+
+      // Generates the key
+      $authorization = $this->generateGitHubToken($username, $password);
+
+      // Output to user.
+      $output->writeln("Token created: $authorization");
+
+      // Ask to write to file
+      if ($dialog->askConfirmation(
+        $output,
+        "Write to <comment>$hubdrop_path_to_github_auth</comment>?</question> ",
+        false
+      )){
+        if (file_put_contents($hubdrop_path_to_github_auth, $authorization)){
+          $output->writeln("Wrote to $hubdrop_path_to_github_auth.");
+        }
+        else {
+          $output->writeln("Could not write to $hubdrop_path_to_github_auth.");
+        }
+      }
+    }
+    // Doesn't need new code: we still need username.
+    else {
+      $username = $this->getContainer()->getParameter('hubdrop.github_username');
+
+    }
+
+    // Ask to push up ssh key.
+    if ($dialog->askConfirmation(
+      $output,
+      "Upload SSH key to <comment>$username's</comment> account? ",
+      false
+    )){
+
+      // Post SSH key.
+      $url = $this->getContainer()->getParameter('hubdrop.url');
+      $title = "$username@$url";
+      $key = file_get_contents('/var/hubdrop/.ssh/id_rsa.pub');
+
+      $params = array(
+        'title' => $title,
+        'key' => $key,
+      );
+
+      $client = $this->getContainer()->get('hubdrop')->getGithubClient($authorization);
+
+      $api = $client->api('current_user');
+      $keys = $api->keys();
+      $response = $keys->create($params);
+
+      if (empty($response['id'])){
+        throw new Exception('Something failed when uploading your public key.');
+      }
+      else {
+        $output->writeln("<info>SSH Key added to $username's github account.</info>");
+      }
+
     }
   }
 
@@ -63,7 +125,7 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     $request = $client->post('/authorizations')
       ->setAuth($username, $password);
 
-    $request->setBody('{"scopes": ["repo"]}', 'application/json');
+    $request->setBody('{"scopes": ["repo", "user"]}', 'application/json');
 
     $response = $request->send();
     $data = json_decode($response->getBody());

@@ -4,6 +4,8 @@ parameters:
   hubdrop.github_authorization_key: "%app.github.authorization%"
   hubdrop.drupal_username: "%app.drupal.username%"
   hubdrop.url: "%app.url%"
+  hubdrop.paths.home: "/var/hubdrop"
+  hubdrop.paths.github_authorization: "/var/hubdrop/.github-authorization"
 
 services:
   hubdrop:

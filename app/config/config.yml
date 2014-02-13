@@ -1,9 +1,10 @@
         
 imports:
+    - { resource: "@HubDropBundle/Resources/config/services.yml" }
     - { resource: config.php }
     - { resource: parameters.yml }
     - { resource: security.yml }
-    - { resource: "@HubDropBundle/Resources/config/services.yml" }
+
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }

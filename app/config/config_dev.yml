@@ -1,6 +1,5 @@
 imports:
     - { resource: config.yml }
-    - { resource: local.php }
 
 framework:
     router:
