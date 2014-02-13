@@ -143,9 +143,9 @@ class Project {
         (bool) $this->checkUrl('github'):
         FALSE;
 
+      // Set GitHub Org to match HubDrop
+      $this->github_organization = $this->hubdrop->github_organization;
     }
-    // Set GitHub Org to match HubDrop
-    $this->github_organization = $this->hubdrop->github_organization;
   }
 
   /**
@@ -394,6 +394,10 @@ class Project {
       $repo = $client->api('repo')->update($this->github_organization, $this->name, array('name' => $this->name, 'default_branch' => $branch));
     }
     catch (\Github\Exception\ValidationFailedException $e) {
+      return FALSE;
+    }
+    catch (\Github\Exception\RuntimeException $e){
+      // @TODO: Log something
       return FALSE;
     }
   }
