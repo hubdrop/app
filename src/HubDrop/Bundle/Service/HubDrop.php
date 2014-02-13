@@ -41,7 +41,6 @@ class HubDrop {
     $url,
     Router $router, Session $session
   ) {
-
     $this->github_username = $github_username;
     $this->github_organization = $github_organization;
     $this->github_authorization_key = $github_authorization_key;
@@ -66,6 +65,7 @@ class HubDrop {
    * Get a authenticated GitHub Client Object
    */
   public function getGithubClient(){
+    // Create the Repo on GitHub (this can be run by www-data, or any user.)
     $client = new \Github\Client();
     $client->authenticate($this->github_authorization_key, '', \GitHub\Client::AUTH_URL_TOKEN);
     return $client;

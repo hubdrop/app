@@ -13,6 +13,7 @@ use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Acl\Exception\Exception;
 
 
 class Project {
@@ -350,9 +351,8 @@ class Project {
       $url = $this->getUrl();
       $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->getUrl('hubdrop'), true, $this->hubdrop->github_organization);
     }
-    catch (ValidationFailedException $e) {
+    catch (\Github\Exception\RuntimeException $e) {
       // If it already exists, that's ok, but alert the user.
-      // @TODO: Learn Symfony best practices for logging, error handling...
       return FALSE;
     }
   }

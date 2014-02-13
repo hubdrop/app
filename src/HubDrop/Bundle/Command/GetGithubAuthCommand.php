@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GetGithubAuthCommand extends ContainerAwareCommand
@@ -21,21 +20,39 @@ class GetGithubAuthCommand extends ContainerAwareCommand
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    // Get hubdrop service and github username.
-    $hubdrop = $this->getContainer()->get('hubdrop');
-    $username = $hubdrop->github_username;
+//    // Get hubdrop service and github username.
+//    $hubdrop = $this->getContainer()->get('hubdrop');
+//    $username = $hubdrop->github_username;
 
     // Get password
     $dialog = $this->getHelperSet()->get('dialog');
-    $password = $dialog->askHiddenResponse($output, "What is the password for $username on GitHub? ");
+    $username = $dialog->ask($output, "GitHub Username? ");
+    $password = $dialog->askHiddenResponse($output, "GitHub Password? ");
 
     // @TODO: We should lookup existing tokens and display them.
 
-    // Generates the token
-    $token = $this->generateGitHubToken($username, $password);
+    // Generates the key
+    $key = $this->generateGitHubToken($username, $password);
 
     // Output to user.
-    $output->writeln("Token created: $token");
+    $output->writeln("Token created: $key");
+
+    // Ask to write to file
+    if ($dialog->askConfirmation(
+      $output,
+      '<question>Write to /etc/hubdrop-github-authorization?</question> ',
+      false
+    )){
+      if (file_put_contents('/etc/hubdrop-github-authorization', $key)){
+        $output->writeln("Wrote to /etc/hubdrop-github-authorization");
+      }
+      else {
+        $output->writeln("Could not write to /etc/hubdrop-github-authorization. Try:");
+        $output->writeln(" sudo hubdrop github_auth");
+        $output->writeln("            -or- ");
+        $output->writeln(" echo '$key' | sudo tee -a /etc/hubdrop-github-authorization");
+      }
+    }
   }
 
   /**
