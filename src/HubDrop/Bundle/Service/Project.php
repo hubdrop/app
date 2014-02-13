@@ -143,9 +143,9 @@ class Project {
         (bool) $this->checkUrl('github'):
         FALSE;
 
-      // Set GitHub Org to match HubDrop
-      $this->github_organization = $this->hubdrop->github_organization;
     }
+    // Set GitHub Org to match HubDrop
+    $this->github_organization = $this->hubdrop->github_organization;
   }
 
   /**
@@ -281,7 +281,7 @@ class Project {
 
     // If source == github, update maintainers
     if ($this->source == 'github'){
-      $this->updateMaintainers();
+      //$this->updateMaintainers();
     }
   }
 
