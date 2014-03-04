@@ -292,7 +292,7 @@ class Project {
     // @TODO: ensure the remotes exist?
     $cmds = array();
     $cmds[] = "git fetch -p origin";
-    $cmds[] = "git push origin --mirror";
+    $cmds[] = "git push origin";
 
     // @TODO: Throw an exception if something fails.
     chdir($this->getUrl('localhost', 'path'));
