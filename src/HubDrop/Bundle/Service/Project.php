@@ -66,7 +66,7 @@ class Project {
       'github' => array(
         'web' => "http://github.com/{$hubdrop->github_organization}/{$this->name}",
         'ssh' => "git@github.com:{$hubdrop->github_organization}/{$this->name}.git",
-        'http' =>  "https://github.com/project/{$this->name}.git",
+        'http' =>  "https://github.com/{$hubdrop->github_organization}/{$this->name}.git",
       ),
       'hubdrop' => array(
         'web' => "{$hubdrop->url}/project/{$this->name}",
