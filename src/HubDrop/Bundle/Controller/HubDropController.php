@@ -26,6 +26,7 @@ class HubDropController extends Controller
 
     return $this->render('HubDropBundle:HubDrop:home.html.twig', array(
       'site_base_url' => $this->getRequest()->getHost(),
+      'project_count' => shell_exec('ls -lR /var/hubdrop/repos | grep ^d | wc -l'),
     ));
   }
 
