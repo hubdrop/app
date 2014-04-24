@@ -4,6 +4,9 @@ _home:
 _project:
     path:  /project/{project_name}
     defaults: { _controller: HubDropBundle:HubDrop:project }
+_webhook:
+    path:  /webhook
+    defaults: { _controller: HubDropBundle:HubDrop:webhook }
 _about:
     path:  /about
     defaults: { _controller: HubDropBundle:Page:about}

@@ -228,6 +228,16 @@ class Project {
   }
 
   /**
+   * Queues the update of HubDrop Mirror.  This command should return as
+   * quickly as possible. It simply tells Jenkins to run a job.
+   *
+   * This only works in a HubDrop Vagrant / Chef provisioned server
+   */
+  public function initUpdate(){
+    shell_exec('jenkins-cli build hubdrop-jenkins-update-mirror -p NAME=' . $this->name);
+  }
+
+  /**
    * $project->mirror()
    * The actual creation process for a hubdrop mirror.
    *

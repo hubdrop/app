@@ -3,6 +3,8 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
 use Github\Client as GithubClient;
 
@@ -33,7 +35,7 @@ class HubDropController extends Controller
   /**
    * Route: Project View Page
    */
-  public function projectAction($project_name)
+  public function projectAction($project_name, $webhook = '')
   {
     $project_name = strtolower($project_name);
 
@@ -48,6 +50,10 @@ class HubDropController extends Controller
     if ($project->mirrored == FALSE && $this->get('request')->query->get('mirror') == 'go'){
       $project->initMirror();
       return $this->redirect('/project/' . $project_name);
+    }
+
+    if ($webhook){
+      print $webhook; die;
     }
 
     // Build twig vars
@@ -74,5 +80,57 @@ class HubDropController extends Controller
     $vars['allow_mirroring'] = TRUE;
 
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $vars);
+  }
+
+  /**
+   * Route: Project Webhook Callback
+   */
+  public function webhookAction()
+  {
+    $output = "Hello World";
+
+    // Ensure that it is a POST
+
+    // Ensure that it is github calling.
+    $request = $this->get('request');
+    $request_object = $request->getContent();
+
+    print "REQUEST_CONTENT: ";
+    print_r($request_object);
+
+    $response = new Response();
+    $response->headers->set('Content-Type', 'text/html');
+
+    // Fake it till you make it.
+    $request->headers->set('x-github-event', 'ping');
+
+    // Check for the github event.
+    $github_event = $request->headers->get('x-github-event');
+    if (empty($github_event)){
+      // If request not from github, set Forbidden
+      $output = 'You are not Github. Blocked!';
+      $response->setStatusCode(403);
+    }
+
+    // Ensure it is for one of our projects.
+    if ($github_event == 'push' && $request_object->repository->organization == 'drupalprojects'){
+      // Get Project object
+      $project = $this->get('hubdrop')->getProject($request_object->repository->name);
+
+      // If project source is github, update mirror.
+      if ($project->source == 'github'){
+        $output = 'We should update! Source is github.';
+        $project->initUpdate();
+      }
+      else {
+        $output = 'Source is drupal... we can\'t update...';
+      }
+    }
+
+    // Depending on the action, do something
+    // If project source is drupal, and action is a Pull Request, post an issue with a patch.
+
+    $response->setContent($output);
+    return $response;
   }
 }
