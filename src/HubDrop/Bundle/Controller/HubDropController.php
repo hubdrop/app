@@ -93,10 +93,10 @@ class HubDropController extends Controller
 
     // Ensure that it is github calling.
     $request = $this->get('request');
-    $request_object = $request->getContent();
+    $request_object = json_decode($request->request->parameters->get('payload'));
 
-    print "request->request: ";
-    print_r($request->request);
+    print "json decoded payload: ";
+    print_r($request_object);
 
     $response = new Response();
     $response->headers->set('Content-Type', 'text/html');
