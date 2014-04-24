@@ -95,8 +95,8 @@ class HubDropController extends Controller
     $request = $this->get('request');
     $request_object = $request->getContent();
 
-    print "REQUEST_CONTENT: ";
-    print_r($request_object);
+    print "request->request: ";
+    print_r($request->request);
 
     $response = new Response();
     $response->headers->set('Content-Type', 'text/html');
