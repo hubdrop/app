@@ -93,16 +93,10 @@ class HubDropController extends Controller
 
     // Ensure that it is github calling.
     $request = $this->get('request');
-    $request_object = json_decode($request->request->parameters->get('payload'));
-
-    print "json decoded payload: ";
-    print_r($request_object);
+    $request_object = json_decode($request->getContent());
 
     $response = new Response();
     $response->headers->set('Content-Type', 'text/html');
-
-    // Fake it till you make it.
-    $request->headers->set('x-github-event', 'ping');
 
     // Check for the github event.
     $github_event = $request->headers->get('x-github-event');
