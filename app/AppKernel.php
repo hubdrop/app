@@ -32,4 +32,22 @@ class AppKernel extends Kernel
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
+
+    /**
+     * Overrides the cache directory to simplify permissions.
+     * @return string
+     */
+    public function getCacheDir()
+    {
+      return '/var/hubdrop/cache/'.$this->environment;
+    }
+
+    /**
+     * Overrides the log directory to simplify permissions.
+     * @return string
+     */
+    public function getLogDir()
+    {
+      return '/var/hubdrop/logs/'.$this->environment;
+    }
 }
