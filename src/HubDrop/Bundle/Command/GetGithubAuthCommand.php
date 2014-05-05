@@ -61,21 +61,27 @@ class GetGithubAuthCommand extends ContainerAwareCommand
       // Generates the key
       $authorization = $this->generateGitHubToken($username, $password);
 
-      // Output to user.
-      $output->writeln("Token created: $authorization");
+      if ($authorization) {
+        // Output to user.
+        $output->writeln("Token created: $authorization");
 
-      // Ask to write to file
-      if ($dialog->askConfirmation(
-        $output,
-        "Write to <comment>$hubdrop_path_to_github_auth</comment>?</question> ",
-        false
-      )){
-        if (file_put_contents($hubdrop_path_to_github_auth, $authorization)){
-          $output->writeln("Wrote to $hubdrop_path_to_github_auth.");
+        // Ask to write to file
+        if ($dialog->askConfirmation(
+          $output,
+          "Write to <comment>$hubdrop_path_to_github_auth</comment>?</question> ",
+          false
+        )){
+          if (file_put_contents($hubdrop_path_to_github_auth, $authorization)){
+            $output->writeln("Wrote to $hubdrop_path_to_github_auth.");
+          }
+          else {
+            $output->writeln("Could not write to $hubdrop_path_to_github_auth.");
+          }
         }
-        else {
-          $output->writeln("Could not write to $hubdrop_path_to_github_auth.");
-        }
+      }
+      else {
+        $output->writeln("<error>Authorization creation failed!</error>");
+        return;
       }
     }
     // Doesn't need new code: we still need username.
@@ -125,11 +131,20 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     $request = $client->post('/authorizations')
       ->setAuth($username, $password);
 
-    $request->setBody('{"scopes": ["repo", "user"]}', 'application/json');
+    // @TODO: Use the new get-or-create action
+    // https://developer.github.com/v3/oauth_authorizations/#get-or-create-an-authorization-for-a-specific-app
+    $request->setBody('{"scopes": ["repo", "user"], "note": "HubDrop Authorization"}', 'application/json');
 
-    $response = $request->send();
-    $data = json_decode($response->getBody());
+    // @TODO: Throw our own exception.
+    try {
+      $response = $request->send();
+      $data = json_decode($response->getBody());
+      return $data->token;
+    }
+    catch (\Guzzle\Http\Exception\ClientErrorResponseException $e) {
 
-    return $data->token;
+      print (string) $e->getResponse();
+      return FALSE;
+    }
   }
 }
