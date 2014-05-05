@@ -27,6 +27,8 @@ class HubDrop {
   public $url;
   public $repo_path;
 
+  public $jenkins_url;
+
   /**
    * Symfony router and session.
    */
@@ -39,6 +41,7 @@ class HubDrop {
     $github_authorization_key,
     $drupal_username,
     $url,
+    $jenkins_url,
     Router $router, Session $session
   ) {
     $this->github_username = $github_username;
@@ -47,6 +50,7 @@ class HubDrop {
 
     $this->drupal_username = $drupal_username;
     $this->url = $url;
+    $this->jenkins_url = $jenkins_url;
 
     $this->router = $router;
     $this->session = $session;

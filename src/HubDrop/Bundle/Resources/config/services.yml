@@ -4,10 +4,11 @@ parameters:
   hubdrop.github_authorization_key: "%app.github.authorization%"
   hubdrop.drupal_username: "%app.drupal.username%"
   hubdrop.url: "%app.url%"
+  hubdrop.jenkins_url: "%app.jenkins_url%"
   hubdrop.paths.home: "/var/hubdrop"
   hubdrop.paths.github_authorization: "/var/hubdrop/.github-authorization"
 
 services:
   hubdrop:
     class: HubDrop\Bundle\Service\HubDrop
-    arguments: ["%hubdrop.github_username%", "%hubdrop.github_organization%", "%hubdrop.github_authorization_key%", "%hubdrop.drupal_username%", "%hubdrop.url%", @router, @session]
+    arguments: ["%hubdrop.github_username%", "%hubdrop.github_organization%", "%hubdrop.github_authorization_key%", "%hubdrop.drupal_username%", "%hubdrop.url%", "%hubdrop.jenkins_url%", @router, @session]
