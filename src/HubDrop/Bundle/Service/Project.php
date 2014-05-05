@@ -223,8 +223,9 @@ class Project {
     // set flash messages
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
-    // @TODO: Handle errors and send flash message to user.
-    $output = shell_exec('jenkins-cli build hubdrop-jenkins-create-mirror -p NAME=' . $this->name);
+    // @TODO: Handle errors.
+    $command = "jenkins-cli build create-mirror -p NAME={$this->name}";
+    $output = shell_exec($command);
   }
 
   /**
@@ -234,7 +235,7 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
-    shell_exec('jenkins-cli build hubdrop-jenkins-update-mirror -p NAME=' . $this->name);
+    shell_exec('jenkins-cli build update-mirror -p NAME=' . $this->name);
   }
 
   /**
