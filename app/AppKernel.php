@@ -39,7 +39,7 @@ class AppKernel extends Kernel
      */
     public function getCacheDir()
     {
-      return '/tmp/app/cache/'.$this->environment;
+      return '/var/hubdrop/cache/'.$this->environment;
     }
 
     /**
@@ -48,6 +48,6 @@ class AppKernel extends Kernel
      */
     public function getLogDir()
     {
-      return '/tmp/app/logs/'.$this->environment;
+      return '/var/hubdrop/logs/'.$this->environment;
     }
 }
