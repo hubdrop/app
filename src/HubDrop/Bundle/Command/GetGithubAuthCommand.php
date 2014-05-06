@@ -91,35 +91,39 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     }
 
     // Ask to push up ssh key.
-    if ($dialog->askConfirmation(
-      $output,
-      "Upload SSH key to <comment>$username's</comment> account? ",
-      false
-    )){
+    if (file_exists('/var/hubdrop/.ssh/id_rsa.pub')){
+      if ($dialog->askConfirmation(
+        $output,
+        "Upload SSH key to <comment>$username's</comment> account? ",
+        false
+      )){
 
-      // Post SSH key.
-      $url = $this->getContainer()->getParameter('hubdrop.url');
-      $title = "$username@$url";
-      $key = file_get_contents('/var/hubdrop/.ssh/id_rsa.pub');
+        // Post SSH key.
+        $url = $this->getContainer()->getParameter('hubdrop.url');
+        $title = "$username@$url";
+        $key = file_get_contents('/var/hubdrop/.ssh/id_rsa.pub');
 
-      $params = array(
-        'title' => $title,
-        'key' => $key,
-      );
+        $params = array(
+          'title' => $title,
+          'key' => $key,
+        );
 
-      $client = $this->getContainer()->get('hubdrop')->getGithubClient($authorization);
+        $client = $this->getContainer()->get('hubdrop')->getGithubClient($authorization);
 
-      $api = $client->api('current_user');
-      $keys = $api->keys();
-      $response = $keys->create($params);
+        $api = $client->api('current_user');
+        $keys = $api->keys();
+        $response = $keys->create($params);
 
-      if (empty($response['id'])){
-        throw new Exception('Something failed when uploading your public key.');
+        if (empty($response['id'])){
+          throw new Exception('Something failed when uploading your public key.');
+        }
+        else {
+          $output->writeln("<info>SSH Key added to $username's github account.</info>");
+        }
       }
       else {
-        $output->writeln("<info>SSH Key added to $username's github account.</info>");
+        $output->writeln("<warning>SSH Key not found at '/var/hubdrop/.ssh/id_rsa.pub'</warning> You must have an SSH key to mirror repositories.");
       }
-
     }
   }
 
