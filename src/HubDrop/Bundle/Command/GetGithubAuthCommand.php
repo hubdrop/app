@@ -132,12 +132,20 @@ class GetGithubAuthCommand extends ContainerAwareCommand
    */
   protected function generateGitHubToken($username, $password){
     $client = new Client('https://api.github.com');
-    $request = $client->post('/authorizations')
+
+    $client_id = $this->getContainer()->getParameter('hubdrop.github_app_client_id');
+    $client_secret = $this->getContainer()->getParameter('hubdrop.github_app_client_secret');
+
+    $params = new \stdClass();
+    $params->client_secret = $client_secret;
+    $params->scopes = array('repo', 'user');
+    $params->note = 'HubDrop Authorization';
+    $params->note_url =  $this->getContainer()->getParameter('hubdrop.url');
+
+    $request = $client->put('/authorizations/clients/' . $client_id)
       ->setAuth($username, $password);
 
-    // @TODO: Use the new get-or-create action
-    // https://developer.github.com/v3/oauth_authorizations/#get-or-create-an-authorization-for-a-specific-app
-    $request->setBody('{"scopes": ["repo", "user"], "note": "HubDrop Authorization"}', 'application/json');
+    $request->setBody(json_encode($params), 'application/json');
 
     // @TODO: Throw our own exception.
     try {

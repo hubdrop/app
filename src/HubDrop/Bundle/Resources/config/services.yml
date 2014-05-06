@@ -2,6 +2,9 @@ parameters:
   hubdrop.github_username: "%app.github.username%"
   hubdrop.github_organization: "%app.github.organization%"
   hubdrop.github_authorization_key: "%app.github.authorization%"
+  hubdrop.github_app_client_id: "%app.github.client_id%"
+  hubdrop.github_app_client_secret: "%app.github.client_secret%"
+
   hubdrop.drupal_username: "%app.drupal.username%"
   hubdrop.url: "%app.url%"
   hubdrop.jenkins_url: "%app.jenkins_url%"
