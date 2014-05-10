@@ -61,21 +61,27 @@ class GetGithubAuthCommand extends ContainerAwareCommand
       // Generates the key
       $authorization = $this->generateGitHubToken($username, $password);
 
-      // Output to user.
-      $output->writeln("Token created: $authorization");
+      if ($authorization) {
+        // Output to user.
+        $output->writeln("Token created: $authorization");
 
-      // Ask to write to file
-      if ($dialog->askConfirmation(
-        $output,
-        "Write to <comment>$hubdrop_path_to_github_auth</comment>?</question> ",
-        false
-      )){
-        if (file_put_contents($hubdrop_path_to_github_auth, $authorization)){
-          $output->writeln("Wrote to $hubdrop_path_to_github_auth.");
+        // Ask to write to file
+        if ($dialog->askConfirmation(
+          $output,
+          "Write to <comment>$hubdrop_path_to_github_auth</comment>?</question> ",
+          false
+        )){
+          if (file_put_contents($hubdrop_path_to_github_auth, $authorization)){
+            $output->writeln("Wrote to $hubdrop_path_to_github_auth.");
+          }
+          else {
+            $output->writeln("Could not write to $hubdrop_path_to_github_auth.");
+          }
         }
-        else {
-          $output->writeln("Could not write to $hubdrop_path_to_github_auth.");
-        }
+      }
+      else {
+        $output->writeln("<error>Authorization creation failed!</error>");
+        return;
       }
     }
     // Doesn't need new code: we still need username.
@@ -85,35 +91,39 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     }
 
     // Ask to push up ssh key.
-    if ($dialog->askConfirmation(
-      $output,
-      "Upload SSH key to <comment>$username's</comment> account? ",
-      false
-    )){
+    if (file_exists('/var/hubdrop/.ssh/id_rsa.pub')){
+      if ($dialog->askConfirmation(
+        $output,
+        "Upload SSH key to <comment>$username's</comment> account? ",
+        false
+      )){
 
-      // Post SSH key.
-      $url = $this->getContainer()->getParameter('hubdrop.url');
-      $title = "$username@$url";
-      $key = file_get_contents('/var/hubdrop/.ssh/id_rsa.pub');
+        // Post SSH key.
+        $url = $this->getContainer()->getParameter('hubdrop.url');
+        $title = "$username@$url";
+        $key = file_get_contents('/var/hubdrop/.ssh/id_rsa.pub');
 
-      $params = array(
-        'title' => $title,
-        'key' => $key,
-      );
+        $params = array(
+          'title' => $title,
+          'key' => $key,
+        );
 
-      $client = $this->getContainer()->get('hubdrop')->getGithubClient($authorization);
+        $client = $this->getContainer()->get('hubdrop')->getGithubClient($authorization);
 
-      $api = $client->api('current_user');
-      $keys = $api->keys();
-      $response = $keys->create($params);
+        $api = $client->api('current_user');
+        $keys = $api->keys();
+        $response = $keys->create($params);
 
-      if (empty($response['id'])){
-        throw new Exception('Something failed when uploading your public key.');
+        if (empty($response['id'])){
+          throw new Exception('Something failed when uploading your public key.');
+        }
+        else {
+          $output->writeln("<info>SSH Key added to $username's github account.</info>");
+        }
       }
       else {
-        $output->writeln("<info>SSH Key added to $username's github account.</info>");
+        $output->writeln("<warning>SSH Key not found at '/var/hubdrop/.ssh/id_rsa.pub'</warning> You must have an SSH key to mirror repositories.");
       }
-
     }
   }
 
@@ -122,14 +132,31 @@ class GetGithubAuthCommand extends ContainerAwareCommand
    */
   protected function generateGitHubToken($username, $password){
     $client = new Client('https://api.github.com');
-    $request = $client->post('/authorizations')
+
+    $client_id = $this->getContainer()->getParameter('hubdrop.github_app_client_id');
+    $client_secret = $this->getContainer()->getParameter('hubdrop.github_app_client_secret');
+
+    $params = new \stdClass();
+    $params->client_secret = $client_secret;
+    $params->scopes = array('repo', 'user');
+    $params->note = 'HubDrop Authorization';
+    $params->note_url =  $this->getContainer()->getParameter('hubdrop.url');
+
+    $request = $client->put('/authorizations/clients/' . $client_id)
       ->setAuth($username, $password);
 
-    $request->setBody('{"scopes": ["repo", "user"]}', 'application/json');
+    $request->setBody(json_encode($params), 'application/json');
 
-    $response = $request->send();
-    $data = json_decode($response->getBody());
+    // @TODO: Throw our own exception.
+    try {
+      $response = $request->send();
+      $data = json_decode($response->getBody());
+      return $data->token;
+    }
+    catch (\Guzzle\Http\Exception\ClientErrorResponseException $e) {
 
-    return $data->token;
+      print (string) $e->getResponse();
+      return FALSE;
+    }
   }
 }

@@ -223,8 +223,9 @@ class Project {
     // set flash messages
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
-    // @TODO: Handle errors and send flash message to user.
-    $output = shell_exec('jenkins-cli build create-mirror -p NAME=' . $this->name);
+    // @TODO: Handle errors.
+    $command = "jenkins-cli build create-mirror -p NAME={$this->name}";
+    $output = shell_exec($command);
   }
 
   /**
