@@ -7,7 +7,7 @@
 
 
 // Check for the file
-$hubdrop_path_to_github_auth = $container->getParameter('hubdrop.paths.github_authorization');
+$hubdrop_path_to_github_auth = '/var/hubdrop/.github-authorization';
 if (file_exists($hubdrop_path_to_github_auth)) {
 
   // Load key and set parameter.

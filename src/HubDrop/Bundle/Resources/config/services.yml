@@ -9,7 +9,6 @@ parameters:
   hubdrop.url: "%app.url%"
   hubdrop.jenkins_url: "%app.jenkins_url%"
   hubdrop.paths.home: "/var/hubdrop"
-  hubdrop.paths.github_authorization: "/var/hubdrop/.github-authorization"
 
 services:
   hubdrop:
