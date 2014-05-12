@@ -290,10 +290,6 @@ class Project {
     $this->default_branch = $this->getCurrentBranch();
     $this->setDefaultBranch($this->default_branch);
 
-    // If source == github, update maintainers
-    if ($this->source == 'github'){
-      //$this->updateMaintainers();
-    }
   }
 
   /**
