@@ -1,0 +1,28 @@
+{% extends 'HubDropBundle::layout.html.twig' %}
+
+{% block content_header '' %}
+
+
+{% block content %}
+<div id="header">
+    <a class='pull-left' href='{{ path('_home') }}'><img src='/img/logo.png'></a>
+
+    <h1 class='pull-left'><a href='{{ path('_home') }}'>HubDrop.io</a></h1>
+
+    <h2 class='pull-right'><a href='http://drupal.org/project/{{ project.name }}' target="_blank">{{ project.name }}</a></h2>
+    <p>&nbsp;</p>
+</div>
+
+    <div class="container">
+
+        To move a project to GitHub, you must add "hubdrop" as a maintainer on drupal.org.
+
+        Do that, then hit this button.
+
+        COMING SOON!
+
+    </div>
+
+
+
+{% endblock %}

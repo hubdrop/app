@@ -35,7 +35,7 @@ class HubDropController extends Controller
   /**
    * Route: Project View Page
    */
-  public function projectAction($project_name, $webhook = '')
+  public function projectAction($project_name)
   {
     $project_name = strtolower($project_name);
 
@@ -50,10 +50,6 @@ class HubDropController extends Controller
     if ($project->mirrored == FALSE && $this->get('request')->query->get('mirror') == 'go'){
       $project->initMirror();
       return $this->redirect('/project/' . $project_name);
-    }
-
-    if ($webhook){
-      print $webhook; die;
     }
 
     // Build twig vars
@@ -82,6 +78,25 @@ class HubDropController extends Controller
     return $this->render('HubDropBundle:HubDrop:project.html.twig', $vars);
   }
 
+  /**
+   * Route: Project View Page
+   */
+  public function projectMigrateAction($project_name)
+  {
+
+    // Get Project object
+    $project_name = strtolower($project_name);
+    $vars['project'] = $project = $this->get('hubdrop')->getProject($project_name);
+
+    // If project does not exist or project is not mirrored...
+    if (!$project->exists && !$project->mirrored){
+      $project->hubdrop->session->getFlashBag()->add('notice', "You can't migrate a project that isn't mirrored. Try mirroring it first.");
+      return $this->redirect('/project/' . $project->name);
+    }
+
+    //
+    return $this->render('HubDropBundle:HubDrop:projectMigrate.html.twig', $vars);
+  }
   /**
    * Route: Project Webhook Callback
    */

@@ -4,6 +4,9 @@ _home:
 _project:
     path:  /project/{project_name}
     defaults: { _controller: HubDropBundle:HubDrop:project }
+_project_migrate:
+    path:  /project/{project_name}/migrate
+    defaults: { _controller: HubDropBundle:HubDrop:projectMigrate }
 _webhook:
     path:  /webhook
     defaults: { _controller: HubDropBundle:HubDrop:webhook }

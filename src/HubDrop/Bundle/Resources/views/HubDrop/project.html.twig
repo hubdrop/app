@@ -70,20 +70,42 @@
       {%  endif %}
 
       {%  if project.mirrored %}
-        <p class="text-muted text-center">
+        {% if project.source == 'github' %}
+          <p class="text-muted text-center">
+            This module is hosted on GitHub.  It is mirrored to Drupal.org on every push.
+          </p>
+
+        {%  else %}
+          <p class="text-muted text-center">
             This module is mirrored on GitHub.  It is updated every minute, approximately.
+          </p>
+          <p class="text-muted text-center">
+            <a href='/project/{{ project.name }}/migrate' class="btn btn-success btn-lg" id="migrate-button"><span class="glyphicon glyphicon-transfer"></span><br /> Move Development to GitHub</a>
+          </p>
+
+          </p>
+
+
+        {% endif %}
         </p>
       {%  endif %}
 
 
-        {% if project.committers %}
+        {% if project.source == 'github' and project.committers %}
+        <div class="container">
+
+        <div class="panel panel-info">
+          <div class="panel-heading">
             <h3>GitHub Maintainers</h3>
-            <ul>
+          </div>
+            <ul class="list-group">
             {% for user in project.committers %}
-                <li>{{ user.username|e }} <a href="http://drupal.org/user/{{ user.username }}" class="small text-muted">http://drupal.org/user/{{ user.uid }}</a> <a href="http://github.com/{{ user.username }}" class="small text-muted">http://github.com/{{ user.username }}</a></li>
+                <li class="list-group-item">{{ user.username|e }} <a href="http://drupal.org/user/{{ user.username }}" class="small text-muted">http://drupal.org/user/{{ user.uid }}</a> <a href="http://github.com/{{ user.username }}" class="small text-muted">http://github.com/{{ user.username }}</a></li>
             {% endfor %}
             </ul>
-            <p>Are you a maintainer and are missing from this list? Add a link to your github profile to your Drupal.org account and we will add you on the next update.</p>
+        </div>
+            <a class="list-group-item" href="/project/{{ project.name }}/maintainers" title="Update the list of maintainers from Drupal.org to GitHub.">Update Maintainers List</a>
+            <p class="text-muted container">To add yourself to the GitHub Project, simply add a link to your GitHub.com user to your Drupal.org profile, then click this link.</p>
 
         {% endif %}
 
