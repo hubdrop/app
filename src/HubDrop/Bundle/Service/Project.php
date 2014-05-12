@@ -482,6 +482,7 @@ class Project {
       // 1. Lookup maintainers and admins from drupal.org
       $users = $this->getMaintainers();
     } catch (NonMaintainerException $e) {
+      $this->hubdrop->session->getFlashBag()->add('warning', "No Maintainers Found");
       return;
     }
 
@@ -605,12 +606,11 @@ class Project {
     $page = $mink->getSession()->getPage();
 
     $username = 'hubdrop';
-    if (file_exists('/etc/hubdrop_drupal_pass')){
-      $password = file_get_contents('/etc/hubdrop_drupal_pass');
+    if (file_exists('/var/hubdrop/.hubdrop-drupal-password')){
+      $password = file_get_contents('/var/hubdrop/.hubdrop-drupal-password');
     } else {
-      throw new \Exception("drupal.org user hubdrop password not found in /etc/hubdrop_drupal_pass");
+      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.hubdrop-drupal-password");
     }
-
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
 
@@ -640,8 +640,8 @@ class Project {
       $username = $user->getText();
 
       // Lookup github username locally.
-      if (file_exists('/var/hubdrop/.users/' . $uid)){
-        $github_username = file_get_contents('/var/hubdrop/.users/' . $uid);
+      if (file_exists('/var/hubdrop/users/' . $uid)){
+        $github_username = file_get_contents('/var/hubdrop/users/' . $uid);
       }
       else {
         $github_username = $this->getGithubAccount($uid);
@@ -732,7 +732,10 @@ class Project {
         $username = $github_profile_page->find('css', '.vcard-username')->getText();
 
         // Write to local file
-        file_put_contents('/var/hubdrop/.users/' . $uid, $username);
+        if (!file_exists('/var/hubdrop/users')){
+          mkdir('/var/hubdrop/users');
+        }
+        file_put_contents('/var/hubdrop/users/' . $uid, $username);
         return $username;
       }
       else {
