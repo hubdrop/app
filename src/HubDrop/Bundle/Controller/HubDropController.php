@@ -96,6 +96,15 @@ class HubDropController extends Controller
 
     //
     return $this->render('HubDropBundle:HubDrop:projectMigrate.html.twig', $vars);
+
+    // When the user hits the button, HubDrop must check to see if it can access the
+    // maintainers page of the module, and check if it is listed as a committer.
+    // If not, explain the process and let the user try again.
+
+    // Then, it should check to see if the other committers have added their github
+    // profile link to there drupal profile.  If not, just redirect back to project page
+    // and let the user know to do so.
+
   }
   /**
    * Route: Project Webhook Callback
