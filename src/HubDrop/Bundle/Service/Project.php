@@ -578,7 +578,7 @@ class Project {
 
     // Throw exception if we haven't cloned it yet.
     if ($this->cloned == FALSE){
-      throw new Exception("This project hasn't been mirrored yet.");
+      throw new \Exception("This project hasn't been mirrored yet.");
     }
 
     // Get a Mink object
@@ -598,7 +598,7 @@ class Project {
     if (file_exists('/var/hubdrop/.hubdrop-drupal-password')){
       $password = file_get_contents('/var/hubdrop/.hubdrop-drupal-password');
     } else {
-      throw new Exception("drupal.org user hubdrop password not found in /var/hubdrop/.hubdrop-drupal-password");
+      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.hubdrop-drupal-password");
     }
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
@@ -651,7 +651,7 @@ class Project {
 
     // Fail if there is no github user.
     if ($github_user_exists == FALSE){
-      throw new Exception('Unable to detect GitHub accounts for the maintainers of this project.  Add the URL of your github user profile to your Drupal.org profile to get commit access to this project on GitHub.');
+      throw new \Exception('Unable to detect GitHub accounts for the maintainers of this project.  Add the URL of your github user profile to your Drupal.org profile to get commit access to this project on GitHub.');
     }
 
     // Find permissions
