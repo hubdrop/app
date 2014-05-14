@@ -23,7 +23,7 @@ class GetGithubAuthCommand extends ContainerAwareCommand
   {
     // Check if authorization already exists
     $dialog = $this->getHelperSet()->get('dialog');
-    $hubdrop_path_to_github_auth = $this->getContainer()->getParameter('hubdrop.paths.github_authorization');
+    $hubdrop_path_to_github_auth = '/var/hubdrop/.github-authorization';
 
     // Ask to create a new authorization.
     if (file_exists($hubdrop_path_to_github_auth)){
