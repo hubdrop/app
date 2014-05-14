@@ -641,7 +641,7 @@ class Project {
         $github_username = $this->getGithubAccount($uid);
       }
 
-      $data[$username] = array(
+      $data[$uid] = array(
         'uid' => $uid,
         'username' => $username,
         'github_username' => $github_username,
