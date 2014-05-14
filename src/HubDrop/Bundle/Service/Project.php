@@ -278,7 +278,7 @@ class Project {
 
     // Check if local clone exists
     if ($this->checkUrl("localhost") == FALSE){
-      throw new NotClonedException("Project hasn't been cloned yet. Mirror it first.");
+      throw new \Exception("Project hasn't been cloned yet. Mirror it first.");
     }
 
     // Update all remotes
