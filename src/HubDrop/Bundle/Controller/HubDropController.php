@@ -3,8 +3,6 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
 use Github\Client as GithubClient;
@@ -89,12 +87,12 @@ class HubDropController extends Controller
     $vars['project'] = $project = $this->get('hubdrop')->getProject($project_name);
 
     if ($this->get('request')->query->get('action') == 'migrate') {
+      $project->setSource('github');
 
       try {
-        $project->setSource('github');
         $project->updateMaintainers();
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
         $project->hubdrop->session->getFlashBag()->add('notice', $e->getMessage());
         return $this->redirect('/project/' . $project_name . '/migrate');
       }

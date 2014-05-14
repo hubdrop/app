@@ -10,10 +10,7 @@ namespace HubDrop\Bundle\Service;
 
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Security\Acl\Exception\Exception;
 
 
 class Project {
@@ -316,7 +313,7 @@ class Project {
 
     // If the source USED to be drupal but is now github, create all teams
     if ($source == 'github' && $this->source == 'drupal' && $update_maintainers){
-      $this->updateMaintainers();
+//      $this->updateMaintainers();
     }
 
     // If the source USED to be github but is now Drupal, delete all teams
@@ -614,7 +611,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
+      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
     }
 
     // Click "Maintainers"
