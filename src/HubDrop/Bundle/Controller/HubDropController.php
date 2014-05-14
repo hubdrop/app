@@ -96,12 +96,15 @@ class HubDropController extends Controller
       }
       catch (Exception $e) {
         $project->hubdrop->session->getFlashBag()->add('notice', $e->getMessage());
+        return $this->redirect('/project/' . $project_name . '/migrate');
       }
       catch (\Github\Exception\RuntimeException $e) {
         $project->hubdrop->session->getFlashBag()->add('notice', 'Unable to create teams on GitHub.  Make sure github authorization is configured.');
+        return $this->redirect('/project/' . $project_name . '/migrate');
       }
 
-      return $this->redirect('/project/' . $project_name . '/migrate');
+      $project->hubdrop->session->getFlashBag()->add('notice', 'Project committers team created! You should now be able to commit and push to http://github.com/drupalproject/' . $project->name);
+      return $this->redirect('/project/' . $project_name);
     }
 
     // If project does not exist or project is not mirrored...
