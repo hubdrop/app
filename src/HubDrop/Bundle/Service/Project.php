@@ -578,7 +578,7 @@ class Project {
 
     // Throw exception if we haven't cloned it yet.
     if ($this->cloned == FALSE){
-      throw new \Exception("This project hasn't been mirrored yet.");
+      throw new \Exception("This project hasn't been mirrored yet (on this server).  Run `hubdrop mirror {$this->name}` on the server to continue.");
     }
 
     // Get a Mink object
