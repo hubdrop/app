@@ -3,6 +3,7 @@
 namespace HubDrop\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
@@ -83,10 +84,25 @@ class HubDropController extends Controller
    */
   public function projectMigrateAction($project_name)
   {
-
     // Get Project object
     $project_name = strtolower($project_name);
     $vars['project'] = $project = $this->get('hubdrop')->getProject($project_name);
+
+    if ($this->get('request')->query->get('action') == 'migrate') {
+
+      try {
+        $project->setSource('github');
+        $project->updateMaintainers();
+      }
+      catch (Exception $e) {
+        $project->hubdrop->session->getFlashBag()->add('notice', $e->getMessage());
+      }
+      catch (\Github\Exception\RuntimeException $e) {
+        $project->hubdrop->session->getFlashBag()->add('notice', 'Unable to create teams on GitHub.  Make sure github authorization is configured.');
+      }
+
+      return $this->redirect('/project/' . $project_name . '/migrate');
+    }
 
     // If project does not exist or project is not mirrored...
     if (!$project->exists && !$project->mirrored){

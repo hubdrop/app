@@ -118,20 +118,21 @@ class Project {
       }
 
       // Get GitHub Organization
-      $remotes = explode("\n", $this->exec('git remote -v'));
-
-      foreach ($remotes as $line){
-        list($remote, $url, $type) = preg_split('/\s+/', $line);
-//        origin	git@github.com:pcgroup/engageny2.git (push)
-        if ($remote == 'origin' && $type == '(push)'){
-          // @TODO: REGEX!
-          $url = str_replace('git@github.com:', 'http://github.com/', $url);
-          $url = parse_url($url);
-          $path = explode('/', $url['path']);
-          $this->github_organization = $path[1];
-          break;
-        }
-      }
+//      $remotes = explode("\n", $this->exec('git remote -v'));
+//
+//      foreach ($remotes as $line){
+//        list($remote, $url, $type) = preg_split('/\s+/', $line);
+////        origin	git@github.com:pcgroup/engageny2.git (push)
+//        if ($remote == 'origin' && $type == '(push)'){
+//          // @TODO: REGEX!
+//          $url = str_replace('git@github.com:', 'http://github.com/', $url);
+//          $url = parse_url($url);
+//          $path = explode('/', $url['path']);
+//          $this->github_organization = $path[0];
+//          break;
+//        }
+//      }
+      $this->github_organization = $this->hubdrop->github_organization;
     }
     // If it is not cloned locally...
     else {
@@ -255,7 +256,7 @@ class Project {
   public function mirror(){
     // If there is no drupal project, we can't mirror.
     if ($this->exists == FALSE){
-      throw new NoProjectException('Not a Drupal project.');
+      throw new Exception('Not a Drupal project.');
     }
 
     // Create the GitHub Repo (if it doesn't exist)
@@ -474,13 +475,8 @@ class Project {
     $client = $this->hubdrop->getGithubClient();
     $name = $this->name;
 
-    try {
-      // 1. Lookup maintainers and admins from drupal.org
-      $users = $this->getMaintainers();
-    } catch (NonMaintainerException $e) {
-      $this->hubdrop->session->getFlashBag()->add('warning', "No Maintainers Found");
-      return;
-    }
+    // 1. Lookup maintainers and admins from drupal.org
+    $users = $this->getMaintainers();
 
     $members = array();
     $admins = array();
@@ -488,7 +484,7 @@ class Project {
     $members_github = array();
     $admins_github = array();
 
-    foreach ($users as $uid => $user) {
+    foreach ($users as $username => $user) {
       if (!empty($user['github_username']) && !empty($user['write'])){
         $members[$user['uid']] = $user['github_username'];
       }
@@ -585,7 +581,7 @@ class Project {
 
     // Throw exception if we haven't cloned it yet.
     if ($this->cloned == FALSE){
-      throw new NotClonedException("THIS project hasn't been cloned yet.");
+      throw new Exception("This project hasn't been mirrored yet.");
     }
 
     // Get a Mink object
@@ -605,7 +601,7 @@ class Project {
     if (file_exists('/var/hubdrop/.hubdrop-drupal-password')){
       $password = file_get_contents('/var/hubdrop/.hubdrop-drupal-password');
     } else {
-      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.hubdrop-drupal-password");
+      throw new Exception("drupal.org user hubdrop password not found in /var/hubdrop/.hubdrop-drupal-password");
     }
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
@@ -618,7 +614,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new NonMaintainerException('Unable to access project maintainers list. Have someone add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
+      throw new Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
     }
 
     // Click "Maintainers"
@@ -628,6 +624,8 @@ class Project {
     // Find users
     $data = array();
     $users = $page->findAll('css', '#project-maintainers-form .username');
+    $github_user_exists = FALSE;
+
     foreach ($users as $user){
       $url = $user->getAttribute('href');
       // @TODO: learn regular expressions
@@ -643,11 +641,20 @@ class Project {
         $github_username = $this->getGithubAccount($uid);
       }
 
-      $data[$uid] = array(
+      $data[$username] = array(
         'uid' => $uid,
         'username' => $username,
         'github_username' => $github_username,
       );
+
+      if ($github_username) {
+        $github_user_exists = TRUE;
+      }
+    }
+
+    // Fail if there is no github user.
+    if ($github_user_exists == FALSE){
+      throw new Exception('Unable to detect GitHub accounts for the maintainers of this project.  Add the URL of your github user profile to your Drupal.org profile to get commit access to this project on GitHub.');
     }
 
     // Find permissions
@@ -666,6 +673,8 @@ class Project {
         }
       }
     }
+
+    // @TODO: Throw exception if write to vcs is missing for hubdrop.
     return $data;
   }
 
@@ -769,8 +778,3 @@ class Project {
     }
   }
 }
-
-
-class NonMaintainerException extends \Exception { }
-class NoProjectException extends \Exception { }
-class NotClonedException extends \Exception { }
