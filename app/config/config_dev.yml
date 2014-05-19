@@ -1,6 +1,9 @@
 imports:
     - { resource: config.yml }
 
+twig:
+  cache: false
+
 framework:
     router:
         resource: "%kernel.root_dir%/config/routing_dev.yml"
