@@ -10,13 +10,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GetGithubAuthCommand extends ContainerAwareCommand
+class ConfigureCommand extends ContainerAwareCommand
 {
   protected function configure()
   {
     $this
-      ->setName('hubdrop:github_auth')
-      ->setDescription('Generate a github authorization token.');
+      ->setName('hubdrop:configure')
+      ->setDescription('Configure hubdrop authorizations.');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -24,6 +24,44 @@ class GetGithubAuthCommand extends ContainerAwareCommand
     // Check if authorization already exists
     $dialog = $this->getHelperSet()->get('dialog');
     $hubdrop_path_to_github_auth = '/var/hubdrop/.github-authorization';
+    $hubdrop_path_to_drupal_pass = '/var/hubdrop/.drupal-password';
+
+    // Ask to create a new password file.
+    if (file_exists($hubdrop_path_to_github_auth)){
+      if ($dialog->askConfirmation(
+        $output,
+        "Drupal user password file already exists at $hubdrop_path_to_drupal_pass.  Generate a new one? ",
+        false
+      )){
+        $need_new_pass = TRUE;
+      }
+      else {
+        $need_new_pass = FALSE;
+        $password = file_get_contents($hubdrop_path_to_drupal_pass);
+      }
+    }
+    else {
+      $need_new_pass = TRUE;
+    }
+
+    // If need new password file...
+    if ($need_new_pass){
+      $password = $dialog->askHiddenResponse($output, "Drupal.org password? ");
+
+      // Ask to write to file
+      if ($dialog->askConfirmation(
+        $output,
+        "Write to <comment>$hubdrop_path_to_drupal_pass</comment>?</question> ",
+        false
+      )){
+        if (file_put_contents($hubdrop_path_to_drupal_pass, $password)){
+          $output->writeln("Wrote to $hubdrop_path_to_drupal_pass.");
+        }
+        else {
+          $output->writeln("Could not write to $hubdrop_path_to_drupal_pass.");
+        }
+      }
+    }
 
     // Ask to create a new authorization.
     if (file_exists($hubdrop_path_to_github_auth)){
