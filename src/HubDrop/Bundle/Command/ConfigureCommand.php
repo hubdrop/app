@@ -159,9 +159,9 @@ class ConfigureCommand extends ContainerAwareCommand
           $output->writeln("<info>SSH Key added to $username's github account.</info>");
         }
       }
-      else {
-        $output->writeln("<warning>SSH Key not found at '/var/hubdrop/.ssh/id_rsa.pub'</warning> You must have an SSH key to mirror repositories.");
-      }
+    }
+    else {
+      $output->writeln("<warning>SSH Key not found at '/var/hubdrop/.ssh/id_rsa.pub'</warning> You must have an SSH key to mirror repositories.");
     }
   }
 
