@@ -515,20 +515,6 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id = $team['id'];
     }
-    // If team is found, remove all members.
-    else {
-      // Committers
-      $team_members = $client->api('teams')->members($team_id);
-      foreach ($team_members as $member){
-        $members_github[] = $member['login'];
-
-        // Remove the member only if they are not committers
-        if (!in_array($member['login'], $members)){
-          $client->api('teams')->removeMember($team_id, $member['login']);
-          $this->exec("git config --remove-section hubdrop.committers." . $member['login']);
-        }
-      }
-    }
 
     // If admin team not found... create them.
     if (empty($team_id_admin)){
