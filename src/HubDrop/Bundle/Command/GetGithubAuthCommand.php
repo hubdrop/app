@@ -54,12 +54,12 @@ class GetGithubAuthCommand extends ContainerAwareCommand
 
       // Get password
       $username = $dialog->ask($output, "GitHub Username (default: $hubdrop_github_username)? ", $hubdrop_github_username);
-      $password = $dialog->askHiddenResponse($output, "GitHub Password? ");
-
-      // @TODO: We should lookup existing tokens and display them.
+      $password = $dialog->askHiddenResponse($output, "GitHub Password? (Won't be stored.)");
+      $client_id = $dialog->ask($output, "GitHub Application Client ID");
+      $client_secret = $dialog->ask($output, "GitHub Application Client Secret");
 
       // Generates the key
-      $authorization = $this->generateGitHubToken($username, $password);
+      $authorization = $this->generateGitHubToken($username, $password, $client_id, $client_secret);
 
       if ($authorization) {
         // Output to user.
@@ -130,11 +130,9 @@ class GetGithubAuthCommand extends ContainerAwareCommand
   /**
    * Generates a GitHub Token
    */
-  protected function generateGitHubToken($username, $password){
+  protected function generateGitHubToken($username, $password, $client_id, $client_secret){
     $client = new Client('https://api.github.com');
 
-    $client_id = $this->getContainer()->getParameter('hubdrop.github_app_client_id');
-    $client_secret = $this->getContainer()->getParameter('hubdrop.github_app_client_secret');
 
     $params = new \stdClass();
     $params->client_secret = $client_secret;
