@@ -749,7 +749,7 @@ class Project {
 
     // Look for existing webhook
     foreach ($webhooks as $webhook){
-      if ($webhook['config']['url'] == $this->hubdrop->url . '/webhook') {
+      if ($webhook['config']['url'] == 'http://' . $this->hubdrop->url . '/webhook') {
         // @TODO: Send message about hook already existing.
         return $webhook['id'];
       }
@@ -759,7 +759,7 @@ class Project {
     $params = array();
     $params['name'] = 'web';
     $params['config'] = array();
-    $params['config']['url'] = $this->hubdrop->url . '/webhook';
+    $params['config']['url'] = 'http://' . $this->hubdrop->url . '/webhook';
 
     $hook = $hooks->create($this->github_organization, $this->name, $params);
     return $hook['id'];
