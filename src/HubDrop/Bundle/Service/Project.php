@@ -313,7 +313,7 @@ class Project {
 
     // If the source USED to be drupal but is now github, create all teams
     if ($source == 'github' && $this->source == 'drupal' && $update_maintainers){
-//      $this->updateMaintainers();
+      $this->updateMaintainers();
     }
 
     // If the source USED to be github but is now Drupal, delete all teams

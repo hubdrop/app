@@ -87,10 +87,9 @@ class HubDropController extends Controller
     $vars['project'] = $project = $this->get('hubdrop')->getProject($project_name);
 
     if ($this->get('request')->query->get('action') == 'migrate') {
-      $project->setSource('github');
 
       try {
-        $project->updateMaintainers();
+        $project->setSource('github');
       }
       catch (\Exception $e) {
         $project->hubdrop->session->getFlashBag()->add('notice', $e->getMessage());
