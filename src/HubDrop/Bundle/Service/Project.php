@@ -314,6 +314,7 @@ class Project {
     // If the source USED to be drupal but is now github, create all teams
     if ($source == 'github' && $this->source == 'drupal' && $update_maintainers){
       $this->updateMaintainers();
+      $this->updateWebhook();
     }
 
     // If the source USED to be github but is now Drupal, delete all teams
@@ -747,6 +748,35 @@ class Project {
     else {
       return FALSE;
     }
+  }
+
+  /**
+   * Update GitHub.com project webhook..
+   */
+  public function updateWebhook(){
+
+    // Get GitHub Client and hooks API.
+    $client = $this->hubdrop->getGithubClient();
+    $hooks = $client->api('repo')->hooks();
+
+    $webhooks = $hooks->all($this->github_organization, $this->name);
+
+    // Look for existing webhook
+    foreach ($webhooks as $webhook){
+      if ($webhook['config']['url'] == $this->hubdrop->url . '/webhook') {
+        // @TODO: Send message about hook already existing.
+        return $webhook['id'];
+      }
+    }
+
+    // Create a webhook.
+    $params = array();
+    $params['name'] = 'web';
+    $params['config'] = array();
+    $params['config']['url'] = $this->hubdrop->url . '/webhook';
+
+    $hook = $hooks->create($this->github_organization, $this->name, $params);
+    return $hook['id'];
   }
 
   /**
