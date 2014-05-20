@@ -530,18 +530,6 @@ class Project {
       $team = $client->api('teams')->create($this->github_organization, $vars);
       $team_id_admin = $team['id'];
     }
-    // If team is found, remove all members.
-    else {
-      // Admins
-      $team_members = $client->api('teams')->members($team_id_admin);
-      foreach ($team_members as $member){
-        $admins_github[] = $member['login'];
-        if (!in_array($member['login'], $admins)){
-          $client->api('teams')->removeMember($team_id_admin, $member['login']);
-          $this->exec("git config --remove-section hubdrop.admins." . $member['login']);
-        }
-      }
-    }
 
     // 3. Add all drupal maintainers to Push team, all admins to admin team
     foreach ($members as $uid => $member){
