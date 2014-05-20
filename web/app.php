@@ -14,8 +14,8 @@ $loader->register(true);
 
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';
-if ($_SERVER['HTTP_HOST'] == 'hubdrop.io'){
-  $env = 'prod';
+if ($_SERVER['SYMFONY_ENV']) {
+  $env = $_SERVER['SYMFONY_ENV'];
 }
 else {
   $env = 'dev';
