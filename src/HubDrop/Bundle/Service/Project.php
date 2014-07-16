@@ -599,10 +599,7 @@ class Project {
     $github_user_exists = FALSE;
 
     foreach ($users as $user){
-      $url = $user->getAttribute('href');
-      // @TODO: learn regular expressions
-      $path = explode('/', $url);
-      $uid = array_pop($path);
+      $uid = $user->getAttribute('data-uid');
       $username = $user->getText();
 
       // Lookup github username locally.
