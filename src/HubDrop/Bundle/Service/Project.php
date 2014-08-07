@@ -745,6 +745,7 @@ class Project {
     $params['name'] = 'web';
     $params['config'] = array();
     $params['config']['url'] = 'http://' . $this->hubdrop->url . '/webhook';
+    $params['config']['content_type'] = 'json';
 
     $hook = $hooks->create($this->github_organization, $this->name, $params);
     return $hook['id'];
