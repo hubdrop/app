@@ -5,6 +5,8 @@ namespace Github\Api\Repository;
 use Github\Api\AbstractApi;
 use Github\Exception\InvalidArgumentException;
 use Github\Exception\ErrorException;
+use Github\Exception\MissingArgumentException;
+use Github\Exception\TwoFactorAuthenticationRequiredException;
 
 /**
  * @link   http://developer.github.com/v3/repos/contents/
@@ -50,6 +52,160 @@ class Contents extends AbstractApi
         return $this->get($url, array(
             'ref' => $reference
         ));
+    }
+
+    /**
+     * Creates a new file in a repository
+     * @link http://developer.github.com/v3/repos/contents/#create-a-file
+     *
+     * @param string      $username   the user who owns the repository
+     * @param string      $repository the name of the repository
+     * @param string      $path       path to file
+     * @param string      $content    contents of the new file
+     * @param string      $message    the commit message
+     * @param null|string $branch     name of a branch
+     * @param null|array  $committer  information about the committer
+     *
+     * @throws MissingArgumentException
+     *
+     * @return array information about the new file
+     */
+    public function create($username, $repository, $path, $content, $message, $branch = null, array $committer = null)
+    {
+        $url = 'repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/contents/'.rawurlencode($path);
+
+        $parameters = array(
+          'content' => base64_encode($content),
+          'message' => $message,
+        );
+
+        if (null !== $branch) {
+            $parameters['branch'] = $branch;
+        }
+
+        if (null !== $committer) {
+            if (!isset($committer['name'], $committer['email'])) {
+                throw new MissingArgumentException(array('name', 'email'));
+            }
+            $parameters['committer'] = $committer;
+        }
+
+        return $this->put($url, $parameters);
+    }
+
+    /**
+     * Checks that a given path exists in a repository.
+     *
+     * @param string      $username the user who owns the repository
+     * @param string      $repository the name of the repository
+     * @param string      $path path of file to check
+     * @param null|string $reference reference to a branch or commit
+     * @return boolean
+     */
+    public function exists($username, $repository, $path, $reference = null)
+    {
+        $url = 'repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/contents';
+
+        if (null !== $path) {
+            $url .= '/'.rawurlencode($path);
+        }
+
+        try {
+            $response = $this->head($url, array(
+                'ref' => $reference
+            ));
+
+            if ($response->getStatusCode() != 200) {
+                return false;
+            }
+        } catch (TwoFactorAuthenticationRequiredException $ex) {
+            throw $ex;
+        } catch (\Exception $ex) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Updates the contents of a file in a repository
+     * @link http://developer.github.com/v3/repos/contents/#update-a-file
+     *
+     * @param string      $username   the user who owns the repository
+     * @param string      $repository the name of the repository
+     * @param string      $path       path to file
+     * @param string      $content    contents of the new file
+     * @param string      $message    the commit message
+     * @param string      $sha        blob SHA of the file being replaced
+     * @param null|string $branch     name of a branch
+     * @param null|array  $committer  information about the committer
+     *
+     * @throws MissingArgumentException
+     *
+     * @return array information about the updated file
+     */
+    public function update($username, $repository, $path, $content, $message, $sha, $branch = null, array $committer = null)
+    {
+        $url = 'repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/contents/'.rawurlencode($path);
+
+        $parameters = array(
+          'content' => base64_encode($content),
+          'message' => $message,
+          'sha'     => $sha,
+        );
+
+        if (null !== $branch) {
+            $parameters['branch'] = $branch;
+        }
+
+        if (null !== $committer) {
+            if (!isset($committer['name'], $committer['email'])) {
+                throw new MissingArgumentException(array('name', 'email'));
+            }
+            $parameters['committer'] = $committer;
+        }
+
+        return $this->put($url, $parameters);
+    }
+
+
+    /**
+     * Deletes a file from a repository
+     * @link http://developer.github.com/v3/repos/contents/#delete-a-file
+     *
+     * @param string      $username   the user who owns the repository
+     * @param string      $repository the name of the repository
+     * @param string      $path       path to file
+     * @param string      $message    the commit message
+     * @param string      $sha        blob SHA of the file being deleted
+     * @param null|string $branch     name of a branch
+     * @param null|array  $committer  information about the committer
+     *
+     * @throws MissingArgumentException
+     *
+     * @return array information about the updated file
+     */
+    public function rm($username, $repository, $path, $message, $sha, $branch = null, array $committer = null)
+    {
+        $url = 'repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/contents/'.rawurlencode($path);
+
+        $parameters = array(
+          'message' => $message,
+          'sha'     => $sha,
+        );
+
+        if (null !== $branch) {
+            $parameters['branch'] = $branch;
+        }
+
+        if (null !== $committer) {
+            if (!isset($committer['name'], $committer['email'])) {
+                throw new MissingArgumentException(array('name', 'email'));
+            }
+            $parameters['committer'] = $committer;
+        }
+
+        return $this->delete($url, $parameters);
     }
 
     /**

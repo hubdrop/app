@@ -25,6 +25,21 @@ class User extends AbstractApi
     }
 
     /**
+     * Request all users:
+     * @link https://developer.github.com/v3/users/#get-all-users
+     *
+     * @param integer|null $id ID of the last user that you've seen
+     * @return array list of users found
+     */
+    public function all($id = null)
+    {
+        if (!is_integer($id)) {
+            return $this->get('users');
+        }
+        return $this->get('users?since=' . rawurldecode($id));
+    }
+
+    /**
      * Get extended information about a user by its username
      * @link http://developer.github.com/v3/users/
      *
@@ -34,6 +49,18 @@ class User extends AbstractApi
     public function show($username)
     {
         return $this->get('users/'.rawurlencode($username));
+    }
+
+    /**
+     * Get extended information about a user by its username
+     * @link https://developer.github.com/v3/orgs/
+     *
+     * @param  string $username the username to show
+     * @return array  information about organizations that user belongs to
+     */
+    public function organizations($username)
+    {
+        return $this->get('users/'.rawurlencode($username).'/orgs');
     }
 
     /**
@@ -62,7 +89,7 @@ class User extends AbstractApi
 
     /**
      * Request the repository that a specific user is watching
-     * @link http://developer.github.com/v3/repos/watching/
+     * @deprecated see subscriptions method
      *
      * @param  string $username the username
      * @return array  list of watched repositories
@@ -73,15 +100,49 @@ class User extends AbstractApi
     }
 
     /**
+     * Request starred repositories that a specific user has starred
+     * @link http://developer.github.com/v3/activity/starring/
+     *
+     * @param  string $username the username
+     * @param  int $page the page number of the paginated result set
+     * @return array list of starred repositories
+     */
+    public function starred($username, $page = 1)
+    {
+        return $this->get('users/'.rawurlencode($username).'/starred', array(
+            'page' => $page
+        ));
+    }
+
+    /**
+     * Request the repository that a specific user is watching
+     * @link http://developer.github.com/v3/activity/watching/
+     *
+     * @param  string $username the username
+     * @return array  list of watched repositories
+     */
+    public function subscriptions($username)
+    {
+        return $this->get('users/'.rawurlencode($username).'/subscriptions');
+    }
+
+    /**
      * Get the repositories of a user
      * @link http://developer.github.com/v3/repos/
      *
-     * @param  string $username the username
-     * @return array  list of the user repositories
+     * @param  string $username  the username
+     * @param  string $type      role in the repository
+     * @param  string $sort      sort by
+     * @param  string $direction direction of sort, asc or desc
+     * @return array             list of the user repositories
      */
-    public function repositories($username)
+    public function repositories($username, $type = 'owner', $sort = 'full_name', $direction = 'asc')
     {
-        return $this->get('users/'.rawurlencode($username).'/repos');
+        return $this->get('users/'.rawurlencode($username).'/repos', array(
+            'type' => $type,
+            'sort' => $sort,
+            'direction' => $direction
+        ));
     }
 
     /**
