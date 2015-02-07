@@ -147,7 +147,7 @@ class HubDropController extends Controller
     }
 
     // Ensure it is for one of our projects.
-    if ($github_event == 'push' && $request_object->repository->organization == 'drupalprojects'){
+    if ($github_event == 'push'){
       // Get Project object
       $project = $this->get('hubdrop')->getProject($request_object->repository->name);
 
