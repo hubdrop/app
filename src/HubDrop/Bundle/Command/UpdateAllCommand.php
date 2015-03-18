@@ -39,6 +39,13 @@ class UpdateAllCommand extends ContainerAwareCommand
           $output->writeln($out);
 
           $project = $hubdrop->getProject($project_name);
+          if ($project->source == 'drupal') {
+            $project->update();
+          } 
+          else {
+            $output->write('skipping project, source is github.');
+          }
+
           $project->update();
         }
       }
