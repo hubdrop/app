@@ -45,8 +45,6 @@ class UpdateAllCommand extends ContainerAwareCommand
           else {
             $output->write('skipping project, source is github.');
           }
-
-          $project->update();
         }
       }
       closedir($handle);
