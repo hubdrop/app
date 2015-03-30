@@ -158,8 +158,11 @@ class Project {
     if (trim($source) == trim($this->getUrl('drupal', 'http'))){
       return 'drupal';
     }
-    else {
+    elseif (trim($source) == trim($this->getUrl('github', 'http'))) {
       return 'github';
+    }
+    else {
+      return 'unknown';
     }
   }
 

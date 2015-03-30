@@ -39,7 +39,7 @@ class UpdateAllCommand extends ContainerAwareCommand
           $output->writeln($out);
 
           $project = $hubdrop->getProject($project_name);
-          if ($project->source == 'drupal') {
+          if ($project->source == 'drupal' || $project->source == 'unknown') {
             $project->update();
           } 
           else {
