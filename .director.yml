@@ -1,0 +1,9 @@
+
+web:
+    document_root: "/web"
+
+hooks:
+    build: |
+      composer install
+    deploy: |
+      composer install
