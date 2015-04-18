@@ -1,1 +1,10 @@
-/home/jon/Projects/director/test/hubdrop-local/.director.yml
+
+web:
+    document_root: "/web"
+
+hooks:
+    build: |
+      composer install
+    deploy: |
+      composer install
+      composer status
