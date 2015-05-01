@@ -1,8 +1,8 @@
 {
-    "name": "symfony/framework-standard-edition",
+    "name": "HubDrop",
     "license": "MIT",
     "type": "project",
-    "description": "The \"Symfony Standard Edition\" distribution",
+    "description": "HubDrop: Drupal.org projects on GitHub",
     "autoload": {
         "psr-0": { "": "src/" }
     },
@@ -19,7 +19,7 @@
         "sensio/framework-extra-bundle": "2.3.*",
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
-        "knplabs/github-api": "*",
+        "knplabs/github-api": "dev-team-memberships",
         "symfony/console": "*",
         "symfony/dependency-injection": "*",
         "behat/mink": "*",
@@ -55,5 +55,11 @@
         "branch-alias": {
             "dev-master": "2.3-dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/jonpugh/php-github-api"
+        }
+    ]
 }
