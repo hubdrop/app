@@ -100,7 +100,7 @@
           </div>
             <ul class="list-group">
             {% for user in project.committers %}
-                <li class="list-group-item">{{ user.username|e }} <a href="http://drupal.org/user/{{ user.username }}" class="small text-muted">http://drupal.org/user/{{ user.uid }}</a> <a href="http://github.com/{{ user.username }}" class="small text-muted">http://github.com/{{ user.username }}</a></li>
+                <li class="list-group-item">{{ user.username|e }} <a href="http://drupal.org/user/{{ user.uid }}" class="small text-muted">http://drupal.org/user/{{ user.uid }}</a> <a href="http://github.com/{{ user.username }}" class="small text-muted">http://github.com/{{ user.username }}</a></li>
             {% endfor %}
             </ul>
         </div>
