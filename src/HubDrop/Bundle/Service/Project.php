@@ -54,6 +54,11 @@ class Project {
 
     // Set properties
     $this->name = $name = strtolower(trim($name));
+
+    // Get GitHub Organization
+    list($user, $host, $org, $repo) = preg_split('/[@:\/]/', $this->getRemoteUrl('github'));
+    $this->github_organization = $org;
+
     $this->urls = array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/{$this->name}",
@@ -61,9 +66,9 @@ class Project {
         'http' => "http://git.drupal.org/project/{$this->name}.git",
       ),
       'github' => array(
-        'web' => "http://github.com/{$hubdrop->github_organization}/{$this->name}",
-        'ssh' => "git@github.com:{$hubdrop->github_organization}/{$this->name}.git",
-        'http' =>  "https://github.com/{$hubdrop->github_organization}/{$this->name}.git",
+        'web' => "http://github.com/{$this->github_organization}/{$this->name}",
+        'ssh' => "git@github.com:{$this->github_organization}/{$this->name}.git",
+        'http' =>  "https://github.com/{$this->github_organization}/{$this->name}.git",
       ),
       'hubdrop' => array(
         'web' => "{$hubdrop->url}/project/{$this->name}",
@@ -113,23 +118,6 @@ class Project {
           );
         }
       }
-
-      // Get GitHub Organization
-//      $remotes = explode("\n", $this->exec('git remote -v'));
-//
-//      foreach ($remotes as $line){
-//        list($remote, $url, $type) = preg_split('/\s+/', $line);
-////        origin	git@github.com:pcgroup/engageny2.git (push)
-//        if ($remote == 'origin' && $type == '(push)'){
-//          // @TODO: REGEX!
-//          $url = str_replace('git@github.com:', 'http://github.com/', $url);
-//          $url = parse_url($url);
-//          $path = explode('/', $url['path']);
-//          $this->github_organization = $path[0];
-//          break;
-//        }
-//      }
-      $this->github_organization = $this->hubdrop->github_organization;
     }
     // If it is not cloned locally...
     else {
@@ -164,6 +152,16 @@ class Project {
     else {
       return 'unknown';
     }
+  }
+
+  /**
+   * Gets the URL of a remote.
+   *
+   * @return string
+   *   The name of the remote. defaults to "origin"
+   */
+  public function getRemoteUrl($remote = 'origin') {
+    return $this->exec("git config --get remote.{$remote}.url");
   }
 
   /**
@@ -324,7 +322,7 @@ class Project {
     if ($source == 'drupal' && $this->source == 'github'){
       $client = $this->hubdrop->getGitHubClient();
       $name = $this->name;
-      $teams = $client->api('teams')->all($this->hubdrop->github_organization);
+      $teams = $client->api('teams')->all($this->github_organization);
       foreach ($teams as $team){
         if ($team['name'] == "$name committers" || $team['name'] == "$name administrators"){
           $client->api('teams')->remove($team['id']);
@@ -358,7 +356,7 @@ class Project {
     // Create the Repo on GitHub (this can be run by www-data, or any user.)
     try {
       $url = $this->getUrl();
-      $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->getUrl('hubdrop'), true, $this->hubdrop->github_organization);
+      $repo = $client->api('repo')->create($name, "Mirror of $url provided by hubdrop.", $this->getUrl('hubdrop'), true, $this->github_organization);
     }
     catch (\Github\Exception\RuntimeException $e) {
       // If it already exists, that's ok, but alert the user.
