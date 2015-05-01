@@ -154,7 +154,7 @@ class HubDropController extends Controller
       // If project source is github, update mirror.
       if ($project->source == 'github'){
         $output = 'We should update! Source is github.';
-        $project->initUpdate();
+        $output .= $project->initUpdate();
       }
       else {
         $output = 'Source is drupal... we can\'t update...';
