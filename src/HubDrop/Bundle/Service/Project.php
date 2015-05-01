@@ -537,13 +537,13 @@ class Project {
     // 3. Add all drupal maintainers to Push team, all admins to admin team
     foreach ($members as $uid => $member){
       if (!in_array($member, $members_github)){
-        $client->api('teams')->addMembership($team_id, $member);
+        $client->api('teams')->addMember($team_id, $member);
         $this->exec("git config --add hubdrop.committers.$member $uid");
       }
     }
     foreach ($admins as $uid => $member){
       if (!in_array($member, $admins_github)){
-        $client->api('teams')->addMembership($team_id_admin, $member);
+        $client->api('teams')->addMember($team_id_admin, $member);
         $this->exec("git config --add hubdrop.admins.$member $uid");
       }
     }
