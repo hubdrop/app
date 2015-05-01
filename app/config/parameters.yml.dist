@@ -19,3 +19,4 @@ parameters:
     app.drupal.username: hubdrop
     app.url: hubdrop.org
     app.jenkins_url: hubdrop.org:8080
+    app.github.authorization: ''
