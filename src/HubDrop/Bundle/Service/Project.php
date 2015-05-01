@@ -55,11 +55,18 @@ class Project {
     // Set properties
     $this->name = $name = strtolower(trim($name));
 
+    // Set localhost path first...
+    $this->urls = array();
+    $this->urls['localhost'] = array(
+      'path' => "/var/hubdrop/repos/{$this->name}.git",
+    );
+
     // Get GitHub Organization
     list($user, $host, $org, $repo) = preg_split('/[@:\/]/', $this->getRemoteUrl('github'));
     $this->github_organization = $org;
 
-    $this->urls = array(
+    // Set the rest of the URLs
+    $this->urls = $this->urls + array(
       'drupal' => array(
         'web' =>  "http://drupal.org/project/{$this->name}",
         'ssh' => "{$hubdrop->drupal_username}@git.drupal.org:project/{$this->name}.git",
@@ -72,9 +79,6 @@ class Project {
       ),
       'hubdrop' => array(
         'web' => "{$hubdrop->url}/project/{$this->name}",
-      ),
-      'localhost' => array(
-        'path' => "/var/hubdrop/repos/{$this->name}.git",
       ),
     );
 
