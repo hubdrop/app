@@ -238,7 +238,7 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
-    $output = shell_exec('jenkins-cli build update-mirror -p NAME=' . $this->name);
+    $output = shell_exec("jenkins-cli build update-mirror -p NAME={$this->name} -s {$this->hubdrop->jenkins_url}");
     return $output;
   }
 
