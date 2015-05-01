@@ -1,4 +1,8 @@
 parameters:
+
+    locale:            en
+    secret:            ThisTokenIsNotSoSecretChangeIt
+
     app.github.username: hubdrop-user
     app.github.organization: drupalprojects
     app.drupal.username: hubdrop
