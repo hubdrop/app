@@ -158,7 +158,7 @@ class Project {
     if (trim($source) == trim($this->getUrl('drupal', 'http'))){
       return 'drupal';
     }
-    elseif (trim($source) == trim($this->getUrl('github', 'http'))) {
+    elseif (trim($source) == trim($this->getUrl('github', 'ssh'))) {
       return 'github';
     }
     else {
