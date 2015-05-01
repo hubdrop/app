@@ -1,6 +1,6 @@
 HubDrop
 =======
 
-This is the application code for HubDrop.io
+This is the application code for HubDrop.org
 
 

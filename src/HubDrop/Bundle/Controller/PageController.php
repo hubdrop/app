@@ -16,7 +16,7 @@ class PageController extends Controller
     <div class='row'>
 <div class='col-sm-6'>
 <p>
-  <a href='http://hubdrop.io'>HubDrop.io</a> provides mirroring of <a href='http://hubdrop.io'>drupal.org</a> projects on <a href='http://github.com'>GitHub</a> as a free public service.
+  <a href='http://hubdrop.org'>HubDrop.org</a> provides mirroring of <a href='http://hubdrop.org'>drupal.org</a> projects on <a href='http://github.com'>GitHub</a> as a free public service.
 </p>
 <p>
   Drupal.org's git hosting or issue tracking will not be able to move to GitHub anytime soon, so hubdrop will act as a bridge for developers who wish to leverage GitHub for their projects, yet stay connected with the drupal.org community.
