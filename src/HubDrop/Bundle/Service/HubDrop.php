@@ -71,7 +71,7 @@ class HubDrop {
         $this->repo_path = "../" . $repo_path;
       }
       else {
-        $this->repo_path = $repo_path;
+        $this->repo_path = realpath($repo_path);
       }
     }
   }
