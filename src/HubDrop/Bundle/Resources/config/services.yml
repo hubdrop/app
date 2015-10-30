@@ -7,9 +7,11 @@ parameters:
   hubdrop.url: "%app.url%"
   hubdrop.repo_path: "%app.repo_path%"
   hubdrop.jenkins_url: "%app.jenkins_url%"
+  hubdrop.jenkins_username: "%app.jenkins_username%"
+  hubdrop.jenkins_password: "%app.jenkins_password%"
   hubdrop.paths.home: "/var/hubdrop"
 
 services:
   hubdrop:
     class: HubDrop\Bundle\Service\HubDrop
-    arguments: ["%hubdrop.github_username%", "%hubdrop.github_organization%", "%hubdrop.github_authorization_key%", "%hubdrop.drupal_username%", "%hubdrop.url%", "%hubdrop.jenkins_url%", "%hubdrop.repo_path%", @router, @session]
+    arguments: ["%hubdrop.github_username%", "%hubdrop.github_organization%", "%hubdrop.github_authorization_key%", "%hubdrop.drupal_username%", "%hubdrop.url%", "%hubdrop.jenkins_url%", "%hubdrop.jenkins_username%", "%hubdrop.jenkins_password%", "%hubdrop.repo_path%", @router, @session]

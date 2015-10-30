@@ -239,7 +239,7 @@ class Project {
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
     // @TODO: Handle errors.
-    $command = "jenkins-cli -s http://{$this->hubdrop->jenkins_url} build create-mirror -p NAME={$this->name}";
+    $command = "jenkins-cli -s http://{$this->hubdrop->jenkins_url} build create-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}";
     $output = shell_exec($command);
   }
 

@@ -9,4 +9,6 @@ parameters:
     app.url: hubdrop.org
     app.repo_path: /var/hubdrop/repos
     app.jenkins_url: hubdrop.org:8080
+    app.jenkins_username: hubdrop
+    app.jenkins_password: ConfigureInJenkins
     app.github.authorization: ''
