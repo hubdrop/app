@@ -24,8 +24,6 @@ if ($debug) {
     Debug::enable();
 }
 
-print "[HUBDROP:$env] Initiating AppKernel...\n";
-
 $kernel = new AppKernel($env, $debug);
 $application = new Application($kernel);
 
