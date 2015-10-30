@@ -208,6 +208,7 @@ class Project {
    * @return bool|\Guzzle\Http\Message\Response
    */
   public function checkUrl($remote = 'drupal', $type = 'web'){
+    print $this->getUrl($remote, 'path');
     if ($remote == 'localhost'){
       return file_exists($this->getUrl($remote, 'path'));
     }
@@ -349,6 +350,7 @@ class Project {
 
     // Change the remote URLs
     $cmds = array();
+    print $this->getUrl('localhost', 'path');
     chdir($this->getUrl('localhost', 'path'));
     if ($source == 'github'){
       $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
@@ -779,7 +781,9 @@ class Project {
       return shell_exec($cmd);
     }
     else {
-      throw new \Exception("Path not found: " . $this->getUrl('localhost'));
+      $path = $this->getUrl('localhost');
+      $cwd = getcwd();
+      throw new \Exception("Path not found in $cwd: $path");
     }
   }
 
