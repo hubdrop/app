@@ -1,7 +1,11 @@
 #header {
-  padding: 40px 15px;
+  padding: 44px 15px 115px;
   text-align: center;
 }
+.jumbotron {
+    padding-top: 10px !important;
+}
+
 .jumbotron h1 {
   position: relative;
   font-size: 63px !important;

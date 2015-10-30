@@ -8,14 +8,35 @@
         <a class='pull-left' href='{{ path('_home') }}'><img src='/img/logo.png'></a>
 
         <h1 class='pull-left'><a href='{{ path('_home') }}'>HubDrop.org</a></h1>
-
-        <h2 class='pull-right'><a href='http://drupal.org/project/{{ project.name }}' target="_blank">{{ project.name }}</a></h2>
-        <p>&nbsp;</p>
     </div>
 
     <div class="{% if project.mirrored %}mirrored{% endif %}">
     <div class="jumbotron">
+        <h2 class='text-center'><a href='http://drupal.org/project/{{ project.name }}' target="_blank">{{ project.name }}</a></h2 class='pull-left'>
 
+        {%  if project.mirrored %}
+          {% if project.source == 'github' %}
+            <p class="text-muted text-center">
+              The project <em>{{ project.name }}</em> is mirrored from <a href="{{ urls.github.web }}">github.com</a> to <a href="{{ urls.drupal.web }}">drupal.org</a>.
+            </p>
+            <p class="text-muted text-center">
+              <small>
+                The repository on drupal.org is updated on every git push to the repository on github.com.
+              </small>
+            </p>
+
+          {%  else %}
+            <p class="text-muted text-center">
+              The project <em>{{ project.name }}</em> is mirrored from <a href="{{ urls.drupal.web }}">drupal.org</a> to <a href="{{ urls.github.web }}">github.com</a>.
+            </p>
+            <p class="text-muted text-small text-center">
+              <small>
+                Code may take up to 10 minutes to move from drupal.org to github.
+              </small>
+            </p>
+          {% endif %}
+          </p>
+        {%  endif %}
       {% if project.exists %}
       <section class="container"><div class="row">
         <div id="drupal-info" class="col-sm-5 small">
@@ -71,23 +92,21 @@
 
       {%  if project.mirrored %}
         {% if project.source == 'github' %}
-          <p class="text-muted text-center">
-            This module is hosted on GitHub.  It is mirrored to Drupal.org on every push.
-          </p>
-
         {%  else %}
           <p class="text-muted text-center">
-            This module is mirrored on GitHub.  It is updated every minute, approximately.
+            <a href='/project/{{ project.name }}/migrate' class="btn btn-primary btn-lg" id="migrate-button">
+
+                <strong>
+                    <span class="glyphicon glyphicon-transfer"></span><br /> Switch mirror direction
+                </strong>
+                  <br/>
+                <small>Move your project to GitHub</small>
+            </a>
           </p>
           <p class="text-muted text-center">
-            <a href='/project/{{ project.name }}/migrate' class="btn btn-success btn-lg" id="migrate-button"><span class="glyphicon glyphicon-transfer"></span><br /> Move Development to GitHub</a>
+              If you are the project maintainer, you can move your project to GitHub.  Click this button for more instructions.
           </p>
-
-          </p>
-
-
         {% endif %}
-        </p>
       {%  endif %}
 
 
