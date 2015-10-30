@@ -208,7 +208,6 @@ class Project {
    * @return bool|\Guzzle\Http\Message\Response
    */
   public function checkUrl($remote = 'drupal', $type = 'web'){
-    print $this->getUrl($remote, 'path');
     if ($remote == 'localhost'){
       return file_exists($this->getUrl($remote, 'path'));
     }
