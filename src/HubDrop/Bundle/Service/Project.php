@@ -165,7 +165,12 @@ class Project {
    *   The name of the remote. defaults to "origin"
    */
   public function getRemoteUrl($remote = 'origin') {
-    return $this->exec("git config --get remote.{$remote}.url");
+    try {
+      return $this->exec("git config --get remote.{$remote}.url");
+    }
+    catch (\Exception $e) {
+      return '';
+    }
   }
 
   /**
