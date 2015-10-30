@@ -62,7 +62,14 @@ class Project {
     );
 
     // Get GitHub Organization
-    list($user, $host, $org, $repo) = preg_split('/[@:\/]/', $this->getRemoteUrl('github'));
+    $remoteUrl = $this->getRemoteUrl('github');
+
+    if ($remoteUrl) {
+      list($user, $host, $org, $repo) = preg_split('/[@:\/]/', $remoteUrl);
+    }
+    else {
+      $org = $hubdrop->github_organization;
+    }
     $this->github_organization = $org;
 
     // Set the rest of the URLs
