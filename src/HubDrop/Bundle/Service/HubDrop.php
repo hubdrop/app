@@ -42,6 +42,7 @@ class HubDrop {
     $drupal_username,
     $url,
     $jenkins_url,
+    $repo_path,
     Router $router, Session $session
   ) {
     $this->github_username = $github_username;
@@ -55,7 +56,7 @@ class HubDrop {
     $this->router = $router;
     $this->session = $session;
 
-    $this->repo_path = '/var/hubdrop/repos';
+    $this->repo_path = $repo_path;
   }
 
   /**
