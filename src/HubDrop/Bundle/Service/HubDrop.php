@@ -9,6 +9,8 @@ namespace HubDrop\Bundle\Service;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class HubDrop {
 
@@ -56,7 +58,22 @@ class HubDrop {
     $this->router = $router;
     $this->session = $session;
 
-    $this->repo_path = $repo_path;
+    // If running from command line, CWD is the project root.
+    // If Repo Path is relative... we need to alter it to match the CWD.
+    $fs = new Filesystem();
+
+    if ($fs->isAbsolutePath($repo_path)) {
+      $this->repo_path = $repo_path;
+    }
+    else {
+      // If running from web, CWD is "web".
+      if (file_exists('app.php')) {
+        $this->repo_path = "../" . $repo_path;
+      }
+      else {
+        $this->repo_path = $repo_path;
+      }
+    }
   }
 
   /**
