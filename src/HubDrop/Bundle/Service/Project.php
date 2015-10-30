@@ -58,7 +58,7 @@ class Project {
     // Set localhost path first...
     $this->urls = array();
     $this->urls['localhost'] = array(
-      'path' => "/var/hubdrop/repos/{$this->name}.git",
+      'path' => "{$hubdrop->repo_path}/{$this->name}.git",
     );
 
     // Get GitHub Organization
@@ -761,8 +761,14 @@ class Project {
    * Exec Helper
    */
   protected function exec($cmd){
-    chdir($this->getUrl('localhost'));
-    return shell_exec($cmd);
+
+    if (file_exists($this->getUrl('localhost'))) {
+      chdir($this->getUrl('localhost'));
+      return shell_exec($cmd);
+    }
+    else {
+      throw new \Exception("Path not found: " . $this->getUrl('localhost'));
+    }
   }
 
   /**
