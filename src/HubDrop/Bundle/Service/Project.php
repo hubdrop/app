@@ -85,7 +85,7 @@ class Project {
         'http' =>  "https://github.com/{$this->github_organization}/{$this->name}.git",
       ),
       'hubdrop' => array(
-        'web' => "{$hubdrop->url}/project/{$this->name}",
+        'web' => "http://{$hubdrop->url}/project/{$this->name}",
       ),
     );
 
