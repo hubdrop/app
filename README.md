@@ -1,11 +1,18 @@
 HubDrop
 =======
 
-This is the application code for HubDrop.org
+HubDrop.org is a web service that uses this app to mirror git repositories.
+
+This repo is a symfony web app with CLI tools for creating and managing git mirrors. 
 
 
 Commands
 ========
+
+HubDrop.org works using a CLI tool contained in this repo.  This is a symfony app, so the `app/console` file is used.
+
+```
+$ app/console
 
 hubdrop
   hubdrop:configure                     Configure hubdrop authorizations.
@@ -16,3 +23,5 @@ hubdrop
   hubdrop:update                        Update a mirror of HubDrop.
   hubdrop:update:all                    Update all mirrors of HubDrop.
   hubdrop:update_maintainers            Update GitHub maintainers based on Drupal.org info.
+  
+```
