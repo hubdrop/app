@@ -16,7 +16,8 @@ services:
     - "/etc/localtime:/etc/localtime"
 
     environment:
-      SYMFONY_ENV: "prod"
+      # Change to "dev" to enable symfony dev toolbar.
+      SYMFONY_ENV: "test"
 #
 #  composer:
 #    restart: 'no'
