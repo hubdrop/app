@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  web:
+    build:
+      context: ./
+      args:
+        # Change this to match the host user.  Use `id -u` to determine your user.
+        HUBDROP_UID: 1000
+    image: hubdrop:php5-apache
+    ports:
+    - "80:80"
+    volumes:
+    - "../:/var/hubdrop/app:Z"
+    - "./apache.conf:/etc/apache2/sites-available/000-default.conf"
+    - "/etc/localtime:/etc/localtime"
+
+    environment:
+      SYMFONY_ENV: "prod"
+#
+#  composer:
+#    restart: 'no'
+#    image: composer/composer:php5
+#    command: install
+#    volumes:
+#      - "../:/app:Z"
+

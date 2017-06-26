@@ -1,0 +1,2 @@
+Defaults:hubdrop  !requiretty
+hubdrop ALL=NOPASSWD: /usr/local/bin/apache2-foreground
