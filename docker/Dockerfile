@@ -26,6 +26,9 @@ RUN a2enmod rewrite
 RUN chown hubdrop:hubdrop /var/lock/apache2
 RUN chown hubdrop:hubdrop /var/run/apache2
 
+# Set ownership of /etc/apache2/envvars so hubdrop-entrypoint.sh can write to it
+RUN chown hubdrop:hubdrop /etc/apache2/envvars
+
 # Add our own PHP configuration
 COPY php.ini /usr/local/etc/php
 
