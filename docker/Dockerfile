@@ -26,7 +26,6 @@ RUN a2enmod rewrite
 RUN chown hubdrop:hubdrop /var/lock/apache2
 RUN chown hubdrop:hubdrop /var/run/apache2
 
-
 # Add our own PHP configuration
 COPY php.ini /usr/local/etc/php
 
@@ -46,6 +45,9 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     mv composer.phar /usr/local/bin/composer && \
     chmod +x /usr/local/bin/composer && \
     composer
+
+# Link hubdrop CLI
+RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 
 USER hubdrop
 
