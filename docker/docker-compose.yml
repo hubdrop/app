@@ -17,7 +17,7 @@ services:
 
     environment:
       # Change to "dev" to enable symfony dev toolbar.
-      SYMFONY_ENV: "test"
+      SYMFONY_ENV: "dev"
 
   jenkins:
     build:
