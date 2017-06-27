@@ -35,6 +35,11 @@ if [ ! -f /var/hubdrop/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -N "" -f /var/hubdrop/.ssh/id_rsa
 fi
 
+if [ ! -d /var/hubdrop/repos ]; then
+    echo "HD || Creating repos folder ..."
+  mkdir /var/hubdrop/repos
+fi
+
 echo "HD || Public Key:"
 cat ~/.ssh/id_rsa.pub
 
