@@ -11,13 +11,25 @@ services:
     ports:
     - "80:80"
     volumes:
-    - "../:/var/hubdrop/app:Z"
+    - "./hubdrop_home:/var/hubdrop:Z"
     - "./apache.conf:/etc/apache2/sites-available/000-default.conf"
     - "/etc/localtime:/etc/localtime"
 
     environment:
       # Change to "dev" to enable symfony dev toolbar.
       SYMFONY_ENV: "test"
+
+  jenkins:
+    build:
+      context: ./
+      dockerfile: Dockerfile-jenkins
+    ports:
+    - "8080:8080"
+    - "50000:50000"
+    volumes:
+    - "./hubdrop_home:/var/hubdrop:Z"
+
+
 #
 #  composer:
 #    restart: 'no'

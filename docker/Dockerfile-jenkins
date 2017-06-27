@@ -1,0 +1,21 @@
+FROM jenkins:2.46.3
+
+USER root
+
+ARG user=hubdrop
+ARG group=hubdrop
+ARG uid=1000
+ARG gid=1000
+
+ENV JENKINS_HOME /var/hubdrop/jenkins_home
+VOLUME /var/hubdrop/jenkins_home
+
+RUN echo "Creating new user $user and group $group ($uid $gid)..."
+
+RUN userdel jenkins -f
+RUN mkdir -p /var/hubdrop/jenkins_home
+
+RUN groupadd -g ${gid} ${group} \
+    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user}
+RUN chown $user:$group $JENKINS_HOME -R
+USER $user
