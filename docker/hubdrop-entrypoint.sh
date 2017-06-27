@@ -7,8 +7,13 @@ if [ ! -d /var/hubdrop/app ]; then
   git clone https://github.com/hubdrop/app.git /var/hubdrop/app
 fi
 
+echo "HD || Writing log files so they are owned by $USER"
 if [ ! -f /var/hubdrop/app/app/logs/apache.log ]; then
   touch /var/hubdrop/app/app/logs/apache.log
+  touch /var/hubdrop/app/app/logs/apache.error.log
+  touch /var/hubdrop/app/app/logs/dev.log
+  touch /var/hubdrop/app/app/logs/test.log
+  touch /var/hubdrop/app/app/logs/prod.log
 fi
 
 echo "HD || Running composer install ..."
