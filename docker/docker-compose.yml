@@ -12,6 +12,7 @@ services:
     - "80:80"
     volumes:
     - "../:/var/hubdrop/app:Z"
+    - "./repos/:/var/hubdrop/repos:Z"
     - "/etc/localtime:/etc/localtime"
 
     environment:
@@ -29,7 +30,8 @@ services:
     - "8080:8080"
     - "50000:50000"
     volumes:
-    - "./hubdrop_home:/var/hubdrop:Z"
+    - "../:/var/hubdrop/app:Z"
+    - "./repos/:/var/hubdrop/repos:Z"
     - "./jenkins_home:/var/jenkins_home:Z"
 
 
