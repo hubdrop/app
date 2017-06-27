@@ -25,6 +25,12 @@ echo "export SYMFONY_ENV=$SYMFONY_ENV" >> /etc/apache2/envvars
 echo "HD || Running apache2-foreground& ..."
 sudo apache2-foreground&
 
+echo "HD || Generating SSH Key ..."
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+
+echo "HD || Public Key:"
+cat ~/.ssh/id_rsa.pub
+
 # @TODO: Run the hubdrop:queue command
 echo "HD || Running tail -f /var/hubdrop/app/app/logs/apache.log ..."
 tail -f /var/hubdrop/app/app/logs/apache.log
