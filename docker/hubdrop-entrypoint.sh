@@ -3,6 +3,7 @@
 set -e
 
 if [ ! -d /var/hubdrop/app ]; then
+  echo "HD || Running 'git clone https://github.com/hubdrop/app.git /var/hubdrop/app' ..."
   git clone https://github.com/hubdrop/app.git /var/hubdrop/app
 fi
 
