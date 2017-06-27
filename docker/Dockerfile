@@ -56,8 +56,10 @@ RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 USER hubdrop
 
 # Install app source code.
-RUN git clone https://github.com/hubdrop/app.git /var/hubdrop/app
-RUN cd /var/hubdrop/app && composer install
+# @TODO: Create RELEASE Dockerfiles to install the source into.
+# When using this Dockerfile, it will either be mounted or installed via hubdrop-entrypoint.sh
+# RUN git clone https://github.com/hubdrop/app.git /var/hubdrop/app
+# RUN cd /var/hubdrop/app && composer install
 
 WORKDIR /var/hubdrop
 
