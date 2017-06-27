@@ -2,6 +2,10 @@
 
 set -e
 
+if [ ! -d /var/hubdrop/app ]; then
+  git clone https://github.com/hubdrop/app.git /var/hubdrop/app
+fi
+
 echo "HD || Running composer install ..."
 cd /var/hubdrop/app && composer install
 
