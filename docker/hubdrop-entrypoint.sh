@@ -2,6 +2,15 @@
 
 set -e
 
+if [ ! -d /var/hubdrop/app ]; then
+  echo "HD || Running 'git clone https://github.com/hubdrop/app.git /var/hubdrop/app' ..."
+  git clone https://github.com/hubdrop/app.git /var/hubdrop/app
+fi
+
+if [ ! -f /var/hubdrop/app/app/logs/apache.log ]; then
+  touch /var/hubdrop/app/app/logs/apache.log
+fi
+
 echo "HD || Running composer install ..."
 cd /var/hubdrop/app && composer install
 
@@ -15,6 +24,14 @@ echo "export SYMFONY_ENV=$SYMFONY_ENV" >> /etc/apache2/envvars
 
 echo "HD || Running apache2-foreground& ..."
 sudo apache2-foreground&
+
+if [ ! -f /var/hubdrop/.ssh/id_rsa ]; then
+    echo "HD || Generating SSH Key ..."
+    ssh-keygen -t rsa -N "" -f /var/hubdrop/.ssh/id_rsa
+fi
+
+echo "HD || Public Key:"
+cat ~/.ssh/id_rsa.pub
 
 # @TODO: Run the hubdrop:queue command
 echo "HD || Running tail -f /var/hubdrop/app/app/logs/apache.log ..."
