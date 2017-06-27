@@ -17,7 +17,7 @@ RUN adduser hubdrop www-data
 RUN mkdir /var/hubdrop && chown hubdrop:hubdrop /var/hubdrop
 
 # Set SSH config to avoid needing to confirm known hosts.
-RUN echo "Host github.com\n  StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+RUN echo "Host github.com\n  StrictHostKeyChecking no \n  IdentityFile /var/hubdrop/.ssh/id_rsa " >> /etc/ssh/ssh_config
 
 # Allow our user to run apache2-foreground
 COPY sudoers /etc/sudoers.d/hubdrop

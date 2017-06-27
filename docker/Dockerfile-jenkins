@@ -19,7 +19,7 @@ RUN chown $NEW_UID /var/jenkins_home /usr/share/jenkins/ref -R
 RUN chgrp $NEW_UID /var/jenkins_home /usr/share/jenkins/ref -R
 
 # Set SSH config to avoid needing to confirm known hosts.
-RUN echo "Host github.com\n  StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+RUN echo "Host github.com\n  StrictHostKeyChecking no \n  IdentityFile /var/hubdrop/.ssh/id_rsa " >> /etc/ssh/ssh_config
 
 RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 
