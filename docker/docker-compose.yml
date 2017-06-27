@@ -13,6 +13,7 @@ services:
     volumes:
     - "./hubdrop_home:/var/hubdrop:z"
 #    - "./repos/:/var/hubdrop/repos:Z"
+    - "./jenkins_home:/var/jenkins_home:z"
     - "/etc/localtime:/etc/localtime"
 
     environment:
@@ -32,7 +33,7 @@ services:
     volumes:
     - "./hubdrop_home:/var/hubdrop:z"
 #    - "./repos/:/var/hubdrop/repos:Z"
-    - "./jenkins_home:/var/jenkins_home:Z"
+    - "./jenkins_home:/var/jenkins_home:z"
 
 
 #
