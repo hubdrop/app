@@ -25,8 +25,10 @@ echo "export SYMFONY_ENV=$SYMFONY_ENV" >> /etc/apache2/envvars
 echo "HD || Running apache2-foreground& ..."
 sudo apache2-foreground&
 
-echo "HD || Generating SSH Key ..."
-ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+if [ ! -f /var/hubdrop/.ssh/id_rsa ]; then
+    echo "HD || Generating SSH Key ..."
+    ssh-keygen -t rsa -N "" -f /var/hubdrop/.ssh/id_rsa
+fi
 
 echo "HD || Public Key:"
 cat ~/.ssh/id_rsa.pub
