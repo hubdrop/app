@@ -7,6 +7,10 @@ if [ ! -d /var/hubdrop/app ]; then
   git clone https://github.com/hubdrop/app.git /var/hubdrop/app
 fi
 
+if [ ! -f /var/hubdrop/app/app/logs/apache.log ]; then
+  touch /var/hubdrop/app/app/logs/apache.log
+fi
+
 echo "HD || Running composer install ..."
 cd /var/hubdrop/app && composer install
 
