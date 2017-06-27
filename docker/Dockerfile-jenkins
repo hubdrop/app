@@ -2,20 +2,19 @@ FROM jenkins:2.46.3
 
 USER root
 
-ARG user=hubdrop
-ARG group=hubdrop
-ARG uid=1000
-ARG gid=1000
+# ARG user=hubdrop
+# ARG group=hubdrop
 
-ENV JENKINS_HOME /var/hubdrop/jenkins_home
-VOLUME /var/hubdrop/jenkins_home
+ARG NEW_UID=1000
 
-RUN echo "Creating new user $user and group $group ($uid $gid)..."
+RUN echo "Attempting to update jenkins UID to $NEW_UID ..."
+RUN usermod -u $NEW_UID jenkins
 
-RUN userdel jenkins -f
-RUN mkdir -p /var/hubdrop/jenkins_home
+RUN echo "Attempting to update jenkins GID to $NEW_UID ..."
+RUN groupmod -g $NEW_UID jenkins
 
-RUN groupadd -g ${gid} ${group} \
-    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user}
-RUN chown $user:$group $JENKINS_HOME -R
-USER $user
+RUN echo "Attempting to change ownership of /var/jenkins_home to $NEW_UID ..."
+RUN chown $NEW_UID /var/jenkins_home /usr/share/jenkins/ref -R
+RUN chgrp $NEW_UID /var/jenkins_home /usr/share/jenkins/ref -R
+
+USER jenkins
