@@ -20,6 +20,7 @@ RUN chgrp $NEW_UID /var/jenkins_home /usr/share/jenkins/ref -R
 
 RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 
+ENV HOME=/var/hubdrop
 WORKDIR /var/hubdrop
 
 USER jenkins
