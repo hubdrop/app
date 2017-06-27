@@ -15,7 +15,6 @@ RUN echo "Creating user and group 'hubdrop' with UID and GID $HUBDROP_UID..."
 RUN groupadd -r hubdrop --gid $HUBDROP_UID && useradd -r --uid $HUBDROP_UID --gid $HUBDROP_UID --system --home /var/hubdrop hubdrop
 RUN adduser hubdrop www-data
 RUN mkdir /var/hubdrop && chown hubdrop:hubdrop /var/hubdrop
-WORKDIR /var/hubdrop
 
 # Allow our user to run apache2-foreground
 COPY sudoers /etc/sudoers.d/hubdrop
@@ -57,8 +56,10 @@ RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 USER hubdrop
 
 # Install app source code.
-RUN git clone https://github.com/hubdrop/app.git
-RUN cd app && composer install
+RUN git clone https://github.com/hubdrop/app.git /var/hubdrop/app
+RUN cd /var/hubdrop/app && composer install
+
+WORKDIR /var/hubdrop
 
 # Set the container's command to our script.
 CMD ["hubdrop-entrypoint.sh"]
