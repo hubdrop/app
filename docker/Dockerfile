@@ -16,6 +16,9 @@ RUN groupadd -r hubdrop --gid $HUBDROP_UID && useradd -r --uid $HUBDROP_UID --gi
 RUN adduser hubdrop www-data
 RUN mkdir /var/hubdrop && chown hubdrop:hubdrop /var/hubdrop
 
+# Set SSH config to avoid needing to confirm known hosts.
+RUN echo "Host github.com\n  StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
 # Allow our user to run apache2-foreground
 COPY sudoers /etc/sudoers.d/hubdrop
 RUN chmod 0440 /etc/sudoers.d/hubdrop
