@@ -1,6 +1,7 @@
 FROM php:5-apache
 
 RUN apt-get update -qq && apt-get install -y -qq \
+  default-jre \
   git \
   sudo \
   zip
@@ -55,6 +56,9 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 
 # Link hubdrop CLI
 RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
+
+# Link jenkins-CLI. Will be linked from jenkins container.
+RUN echo "alias jenkins-cli='java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar'" >> /etc/bash.bashrc
 
 USER hubdrop
 
