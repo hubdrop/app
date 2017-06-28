@@ -588,12 +588,14 @@ class Project {
     // Fill out the login form and click "Log in"
     $page = $mink->getSession()->getPage();
 
-    $username = 'hubdrop';
-    if (file_exists('/var/hubdrop/.drupal-password')){
-      $password = file_get_contents('/var/hubdrop/.drupal-password');
-    } else {
-      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
-    }
+//    $username = 'hubdrop';
+//    if (file_exists('/var/hubdrop/.drupal-password')){
+//      $password = file_get_contents('/var/hubdrop/.drupal-password');
+//    } else {
+//      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
+//    }
+    $username = $this->hubdrop->drupal_username;
+    $password = $this->hubdrop->drupal_password;
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
 
