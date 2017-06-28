@@ -611,7 +611,7 @@ class Project {
     $page->findButton('Log in')->click();
 
     // Check if logged in
-    if ($mink->getSession()->getPage()->findLink('Request new password')) {
+    if ($mink->getSession()->getPage()->findLink('Have you forgotten your password?')) {
       throw new \Exception('Invalid drupal.org password.  Check app/config/parameters.yml');
 
     }
