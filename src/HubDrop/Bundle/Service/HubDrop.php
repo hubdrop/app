@@ -26,6 +26,7 @@ class HubDrop {
   protected $github_authorization_key;
 
   public $drupal_username;
+  public $drupal_password;
   public $url;
   public $repo_path;
 
@@ -44,6 +45,7 @@ class HubDrop {
     $github_organization,
     $github_authorization_key,
     $drupal_username,
+    $drupal_password,
     $url,
     $jenkins_url,
     $jenkins_username,
@@ -56,6 +58,7 @@ class HubDrop {
     $this->github_authorization_key = $github_authorization_key;
 
     $this->drupal_username = $drupal_username;
+    $this->drupal_password = $drupal_password;
     $this->url = $url;
     $this->jenkins_url = $jenkins_url;
     $this->jenkins_username = $jenkins_username;
