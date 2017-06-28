@@ -616,6 +616,11 @@ class Project {
 
     }
 
+    // Check for blocked login
+    if ($mink->getSession()->getPage()->hasContent('Sorry, there have been more than 5 failed login attempts for this account.')) {
+      throw new \Exception('You have been temporarily blocked by Drupal.org by logging in with a bad password 5 times. Try again later.');
+    }
+
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
