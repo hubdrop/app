@@ -349,7 +349,7 @@ class Project {
 
     // Change the remote URLs
     $cmds = array();
-    print $this->getUrl('localhost', 'path');
+//    print $this->getUrl('localhost', 'path');
     chdir($this->getUrl('localhost', 'path'));
     if ($source == 'github'){
       $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
