@@ -610,6 +610,12 @@ class Project {
 
     $page->findButton('Log in')->click();
 
+    // Check if logged in
+    if ($mink->getSession()->getPage()->findLink('Request new password')) {
+      throw new \Exception('Invalid drupal.org password.  Check app/config/parameters.yml');
+
+    }
+
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
