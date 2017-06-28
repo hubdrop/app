@@ -596,6 +596,12 @@ class Project {
 //    }
     $username = $this->hubdrop->drupal_username;
     $password = $this->hubdrop->drupal_password;
+
+    // Handle missing password.
+    if (empty($password)) {
+      throw new \Exception('No drupal.org password saved. Check app/config/parameters.yml');
+    }
+
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
 
