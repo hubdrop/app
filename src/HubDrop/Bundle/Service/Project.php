@@ -583,7 +583,7 @@ class Project {
     $mink->getSession()->visit($this->getUrl());
 
     // Visit the project page, then click "Log in / Register"
-    $mink->getSession()->getPage()->findLink('Log in / Register')->click();
+    $mink->getSession()->getPage()->findLink('Log in')->click();
 
     // Fill out the login form and click "Log in"
     $page = $mink->getSession()->getPage();
