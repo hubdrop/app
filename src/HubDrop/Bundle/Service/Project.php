@@ -619,7 +619,7 @@ class Project {
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $this->getUrl());
+      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $mink->getSession()->getCurrentUrl());
     }
 
     // Click "Maintainers"
