@@ -250,6 +250,7 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
+    // @TODO: Check response for errors!!
     $output = shell_exec("jenkins-cli build update-mirror -p NAME={$this->name}");
     return $output;
   }
