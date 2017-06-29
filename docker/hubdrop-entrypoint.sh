@@ -41,6 +41,13 @@ if [ ! -d /var/hubdrop/repos ]; then
   mkdir /var/hubdrop/repos
 fi
 
+if [ ! -d /var/hubdrop/users ]; then
+    echo "HD || Creating users folder ..."
+    mkdir /var/hubdrop/users
+    chgrp www-data /var/hubdrop/users
+    chmod 775 /var/hubdrop/users
+fi
+
 echo "HD || Public Key:"
 cat ~/.ssh/id_rsa.pub
 
