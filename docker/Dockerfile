@@ -58,7 +58,8 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 RUN ln -s /var/hubdrop/app/app/console /usr/local/bin/console
 
 # Link jenkins-CLI. Will be linked from jenkins container.
-RUN echo "alias jenkins-cli='java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar'" >> /etc/bash.bashrc
+COPY jenkins-cli.sh /usr/local/bin/jenkins-cli
+RUN chmod +x /usr/local/bin/jenkins-cli
 
 USER hubdrop
 

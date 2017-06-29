@@ -20,6 +20,9 @@ services:
       # Change to "dev" to enable symfony dev toolbar.
       SYMFONY_ENV: "dev"
 
+      # Must match username and password and permissions set in Jenkins admin.
+      JENKINS_URL: http://hubdrop:hubdrop@jenkins:8080
+
   jenkins:
     build:
       context: ./
