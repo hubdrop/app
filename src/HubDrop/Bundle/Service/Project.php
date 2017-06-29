@@ -239,7 +239,7 @@ class Project {
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
     // @TODO: Handle errors.
-    $command = "jenkins-cli -s http://{$this->hubdrop->jenkins_url} build create-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}";
+    $command = "jenkins-cli build create-mirror -p NAME={$this->name}";
     $output = shell_exec($command);
   }
 
@@ -250,7 +250,8 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
-    $output = shell_exec("jenkins-cli -s http://{$this->hubdrop->jenkins_url} build update-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}");
+    // @TODO: Check response for errors!!
+    $output = shell_exec("jenkins-cli build update-mirror -p NAME={$this->name}");
     return $output;
   }
 
@@ -349,7 +350,7 @@ class Project {
 
     // Change the remote URLs
     $cmds = array();
-    print $this->getUrl('localhost', 'path');
+//    print $this->getUrl('localhost', 'path');
     chdir($this->getUrl('localhost', 'path'));
     if ($source == 'github'){
       $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
@@ -583,17 +584,25 @@ class Project {
     $mink->getSession()->visit($this->getUrl());
 
     // Visit the project page, then click "Log in / Register"
-    $mink->getSession()->getPage()->findLink('Log in / Register')->click();
+    $mink->getSession()->getPage()->findLink('Log in')->click();
 
     // Fill out the login form and click "Log in"
     $page = $mink->getSession()->getPage();
 
-    $username = 'hubdrop';
-    if (file_exists('/var/hubdrop/.drupal-password')){
-      $password = file_get_contents('/var/hubdrop/.drupal-password');
-    } else {
-      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
+//    $username = 'hubdrop';
+//    if (file_exists('/var/hubdrop/.drupal-password')){
+//      $password = file_get_contents('/var/hubdrop/.drupal-password');
+//    } else {
+//      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
+//    }
+    $username = $this->hubdrop->drupal_username;
+    $password = $this->hubdrop->drupal_password;
+
+    // Handle missing password.
+    if (empty($password)) {
+      throw new \Exception('No drupal.org password saved. Check app/config/parameters.yml');
     }
+
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
 
@@ -602,10 +611,21 @@ class Project {
 
     $page->findButton('Log in')->click();
 
+    // Check if logged in
+    if ($mink->getSession()->getPage()->findLink('Have you forgotten your password?')) {
+      throw new \Exception('Invalid drupal.org password.  Check app/config/parameters.yml');
+
+    }
+
+    // Check for blocked login
+    if ($mink->getSession()->getPage()->hasContent('Sorry, there have been more than 5 failed login attempts for this account.')) {
+      throw new \Exception('You have been temporarily blocked by Drupal.org by logging in with a bad password 5 times. Check app/config/parameters.yml and try again later.');
+    }
+
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
+      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $mink->getSession()->getCurrentUrl() . 'username pass: ' . $this->hubdrop->drupal_username .' ' . $this->hubdrop->drupal_password);
     }
 
     // Click "Maintainers"
