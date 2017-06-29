@@ -26,6 +26,7 @@ setfacl -dR -m u:www-data:rwX -m u:hubdrop:rwX /var/hubdrop/app/app/cache /var/h
 echo "HD || Saving SYMFONY_ENV to /etc/apache2/envvars from environment variables ..."
 echo "export SYMFONY_ENV=$SYMFONY_ENV"
 echo "export SYMFONY_ENV=$SYMFONY_ENV" >> /etc/apache2/envvars
+echo "export JENKINS_URL=$JENKINS_URL" >> /etc/apache2/envvars
 
 echo "HD || Running apache2-foreground& ..."
 sudo apache2-foreground&
