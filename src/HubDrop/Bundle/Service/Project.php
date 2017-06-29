@@ -239,7 +239,7 @@ class Project {
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
     // @TODO: Handle errors.
-    $command = "jenkins-cli -s http://{$this->hubdrop->jenkins_url} build create-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}";
+    $command = "jenkins-cli build create-mirror -p NAME={$this->name}";
     $output = shell_exec($command);
   }
 
@@ -250,7 +250,7 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
-    $output = shell_exec("jenkins-cli -s http://{$this->hubdrop->jenkins_url} build update-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}");
+    $output = shell_exec("jenkins-cli build update-mirror -p NAME={$this->name}");
     return $output;
   }
 
