@@ -822,5 +822,9 @@ class Project {
         }
       }
     }
+
+    // Check source
+    $this->hubdrop->session->getFlashBag()->add('info', "Repo Source: " . $this->source);
+
   }
 }
