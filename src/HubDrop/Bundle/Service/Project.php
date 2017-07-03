@@ -363,6 +363,12 @@ class Project {
     foreach ($cmds as $cmd){
       exec($cmd);
     }
+
+    // Save results to sources.yml
+    $sources = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($_SERVER['HOME'] . '/sources.yml'));
+    $sources[$this->name] = $source;
+    $yaml = \Symfony\Component\Yaml\Yaml::dump($sources);
+    file_put_contents($_SERVER['HOME'] . '/sources.yml', $yaml);
   }
 
   /**
