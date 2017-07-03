@@ -11,6 +11,7 @@ namespace HubDrop\Bundle\Service;
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Yaml\Yaml;
 
 
 class Project {
@@ -152,16 +153,28 @@ class Project {
    *   "drupal" or "github"
    */
   public function checkSource() {
-    $source = $this->exec('git config --get remote.origin.url');
+    $source_url = $this->exec('git config --get remote.origin.url');
 
-    if (trim($source) == trim($this->getUrl('drupal', 'http'))){
-      return 'drupal';
+    if (trim($source_url) == trim($this->getUrl('drupal', 'http'))){
+      $source = 'drupal';
     }
-    elseif (trim($source) == trim($this->getUrl('github', 'ssh'))) {
-      return 'github';
+    elseif (trim($source_url) == trim($this->getUrl('github', 'ssh'))) {
+      $source = 'github';
     }
     else {
-      return 'unknown';
+      $source = 'unknown';
+    }
+
+    // Lookup sources.yml
+    $sources_overrides = Yaml::parse(file_get_contents($_SERVER['HOME'] . "/sources.yml"));
+
+    // If there is a source override, and it is different than the found source, run setSource();
+    if (isset($sources_overrides[$this->name]) && $sources_overrides[$this->name] != $source) {
+      $this->setSource($sources_overrides[$this->name]);
+      return $sources_overrides[$this->name];
+    }
+    else {
+      return $source;
     }
   }
 
