@@ -538,7 +538,13 @@ class Project {
           "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
+      // Try to create the team. If it fails, just return.
+      try {
+        $team = $client->api('teams')->create($this->github_organization, $vars);
+      } catch (\Github\Exception\ValidationFailedException $e) {
+        // Stop here.
+        return;
+      }
       $team_id = $team['id'];
     }
 
@@ -553,8 +559,13 @@ class Project {
           "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
-      $team_id_admin = $team['id'];
+      // Try to create the team. If it fails, just return.
+      try {
+        $team = $client->api('teams')->create($this->gthub_organization, $vars);
+      } catch (\Github\Exception\ValidationFailedException $e) {
+        return;
+      }
+$team_id_admin = $team['id'];
     }
 
     // 3. Add all drupal maintainers to Push team, all admins to admin team
