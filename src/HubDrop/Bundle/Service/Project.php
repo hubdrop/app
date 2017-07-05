@@ -166,12 +166,17 @@ class Project {
     }
 
     // Lookup sources.yml
-    $sources_overrides = Yaml::parse(file_get_contents($_SERVER['HOME'] . "/sources.yml"));
-
-    // If there is a source override, and it is different than the found source, run setSource();
-    if (isset($sources_overrides[$this->name]) && $sources_overrides[$this->name] != $source) {
-      $this->setSource($sources_overrides[$this->name]);
-      return $sources_overrides[$this->name];
+    if (file_exists($_SERVER['HOME'] . "/sources.yml")) {
+      $sources_overrides = Yaml::parse(file_get_contents($_SERVER['HOME'] . "/sources.yml"));
+  
+      // If there is a source override, and it is different than the found source, run setSource();
+      if (isset($sources_overrides[$this->name]) && $sources_overrides[$this->name] != $source) {
+        $this->setSource($sources_overrides[$this->name]);
+        return $sources_overrides[$this->name];
+      }
+      else {
+        return $source;
+      }
     }
     else {
       return $source;
