@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+  web:
+    build:
+      context: ./
+      args:
+        # Change this to match the host user.  Use `id -u` to determine your user.
+        HUBDROP_UID: 1000
+    image: hubdrop:php5-apache
+    ports:
+    - "80:80"
+    volumes:
+    - "./hubdrop_home:/var/hubdrop:z"
+#    - "./repos/:/var/hubdrop/repos:Z"
+    - "./jenkins_home:/var/jenkins_home:z"
+    - "/etc/localtime:/etc/localtime"
+
+    environment:
+      # Change to "dev" to enable symfony dev toolbar.
+      SYMFONY_ENV: "dev"
+
+      # Must match username and password and permissions set in Jenkins admin.
+      JENKINS_URL: http://hubdrop:hubdrop@jenkins:8080
+
+  jenkins:
+    build:
+      context: ./
+      dockerfile: Dockerfile-jenkins
+      args:
+        # Change this to match the host user, same as hubdrop container.
+        NEW_UID: 1000
+    ports:
+    - "8080:8080"
+    - "50000:50000"
+    volumes:
+    - "./hubdrop_home:/var/hubdrop:z"
+#    - "./repos/:/var/hubdrop/repos:Z"
+    - "./jenkins_home:/var/jenkins_home:z"
+
+
+#
+#  composer:
+#    restart: 'no'
+#    image: composer/composer:php5
+#    command: install
+#    volumes:
+#      - "../:/app:Z"
+

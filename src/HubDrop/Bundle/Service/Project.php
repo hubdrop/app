@@ -11,6 +11,7 @@ namespace HubDrop\Bundle\Service;
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Yaml\Yaml;
 
 
 class Project {
@@ -152,16 +153,33 @@ class Project {
    *   "drupal" or "github"
    */
   public function checkSource() {
-    $source = $this->exec('git config --get remote.origin.url');
+    $source_url = $this->exec('git config --get remote.origin.url');
 
-    if (trim($source) == trim($this->getUrl('drupal', 'http'))){
-      return 'drupal';
+    if (trim($source_url) == trim($this->getUrl('drupal', 'http'))){
+      $source = 'drupal';
     }
-    elseif (trim($source) == trim($this->getUrl('github', 'ssh'))) {
-      return 'github';
+    elseif (trim($source_url) == trim($this->getUrl('github', 'ssh'))) {
+      $source = 'github';
     }
     else {
-      return 'unknown';
+      $source = 'unknown';
+    }
+
+    // Lookup sources.yml
+    if (file_exists($_SERVER['HOME'] . "/sources.yml")) {
+      $sources_overrides = Yaml::parse(file_get_contents($_SERVER['HOME'] . "/sources.yml"));
+  
+      // If there is a source override, and it is different than the found source, run setSource();
+      if (isset($sources_overrides[$this->name]) && $sources_overrides[$this->name] != $source) {
+        $this->setSource($sources_overrides[$this->name]);
+        return $sources_overrides[$this->name];
+      }
+      else {
+        return $source;
+      }
+    }
+    else {
+      return $source;
     }
   }
 
@@ -239,7 +257,7 @@ class Project {
     $session->getFlashBag()->add('notice', "A mirror of " . $this->name . " is being created! Should be ready in a few moments.");
 
     // @TODO: Handle errors.
-    $command = "jenkins-cli -s http://{$this->hubdrop->jenkins_url} build create-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}";
+    $command = "jenkins-cli build create-mirror -p NAME={$this->name}";
     $output = shell_exec($command);
   }
 
@@ -250,7 +268,8 @@ class Project {
    * This only works in a HubDrop Vagrant / Chef provisioned server
    */
   public function initUpdate(){
-    $output = shell_exec("jenkins-cli -s http://{$this->hubdrop->jenkins_url} build update-mirror -p NAME={$this->name} --username={$this->hubdrop->jenkins_username} --password={$this->hubdrop->jenkins_password}");
+    // @TODO: Check response for errors!!
+    $output = shell_exec("jenkins-cli build update-mirror -p NAME={$this->name}");
     return $output;
   }
 
@@ -349,7 +368,7 @@ class Project {
 
     // Change the remote URLs
     $cmds = array();
-    print $this->getUrl('localhost', 'path');
+//    print $this->getUrl('localhost', 'path');
     chdir($this->getUrl('localhost', 'path'));
     if ($source == 'github'){
       $cmds[] = "git remote set-url --push origin " . $this->getUrl('drupal', 'ssh');
@@ -362,6 +381,12 @@ class Project {
     foreach ($cmds as $cmd){
       exec($cmd);
     }
+
+    // Save results to sources.yml
+    $sources = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($_SERVER['HOME'] . '/sources.yml'));
+    $sources[$this->name] = $source;
+    $yaml = \Symfony\Component\Yaml\Yaml::dump($sources);
+    file_put_contents($_SERVER['HOME'] . '/sources.yml', $yaml);
   }
 
   /**
@@ -531,7 +556,13 @@ class Project {
           "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
+      // Try to create the team. If it fails, just return.
+      try {
+        $team = $client->api('teams')->create($this->github_organization, $vars);
+      } catch (\Github\Exception\ValidationFailedException $e) {
+        // Stop here.
+        return;
+      }
       $team_id = $team['id'];
     }
 
@@ -546,8 +577,13 @@ class Project {
           "{$this->github_organization}/{$name}",
         ),
       );
-      $team = $client->api('teams')->create($this->github_organization, $vars);
-      $team_id_admin = $team['id'];
+      // Try to create the team. If it fails, just return.
+      try {
+        $team = $client->api('teams')->create($this->gthub_organization, $vars);
+      } catch (\Github\Exception\ValidationFailedException $e) {
+        return;
+      }
+$team_id_admin = $team['id'];
     }
 
     // 3. Add all drupal maintainers to Push team, all admins to admin team
@@ -583,17 +619,25 @@ class Project {
     $mink->getSession()->visit($this->getUrl());
 
     // Visit the project page, then click "Log in / Register"
-    $mink->getSession()->getPage()->findLink('Log in / Register')->click();
+    $mink->getSession()->getPage()->findLink('Log in')->click();
 
     // Fill out the login form and click "Log in"
     $page = $mink->getSession()->getPage();
 
-    $username = 'hubdrop';
-    if (file_exists('/var/hubdrop/.drupal-password')){
-      $password = file_get_contents('/var/hubdrop/.drupal-password');
-    } else {
-      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
+//    $username = 'hubdrop';
+//    if (file_exists('/var/hubdrop/.drupal-password')){
+//      $password = file_get_contents('/var/hubdrop/.drupal-password');
+//    } else {
+//      throw new \Exception("drupal.org user hubdrop password not found in /var/hubdrop/.drupal-password");
+//    }
+    $username = $this->hubdrop->drupal_username;
+    $password = $this->hubdrop->drupal_password;
+
+    // Handle missing password.
+    if (empty($password)) {
+      throw new \Exception('No drupal.org password saved. Check app/config/parameters.yml');
     }
+
     $el = $page->find('css', '#edit-name');
     $el->setValue($username);
 
@@ -602,10 +646,21 @@ class Project {
 
     $page->findButton('Log in')->click();
 
+    // Check if logged in
+    if ($mink->getSession()->getPage()->findLink('Have you forgotten your password?')) {
+      throw new \Exception('Invalid drupal.org password.  Check app/config/parameters.yml');
+
+    }
+
+    // Check for blocked login
+    if ($mink->getSession()->getPage()->hasContent('Sorry, there have been more than 5 failed login attempts for this account.')) {
+      throw new \Exception('You have been temporarily blocked by Drupal.org by logging in with a bad password 5 times. Check app/config/parameters.yml and try again later.');
+    }
+
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers.');
+      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $mink->getSession()->getCurrentUrl());
     }
 
     // Click "Maintainers"
@@ -763,7 +818,7 @@ class Project {
     $params = array();
     $params['name'] = 'web';
     $params['config'] = array();
-    $params['config']['url'] = 'http://' . $this->hubdrop->url . '/webhook';
+    $params['config']['url'] = 'https://' . $this->hubdrop->url . '/webhook';
     $params['config']['content_type'] = 'json';
 
     $hook = $hooks->create($this->github_organization, $this->name, $params);
@@ -802,5 +857,9 @@ class Project {
         }
       }
     }
+
+    // Check source
+    $this->hubdrop->session->getFlashBag()->add('info', "Repo Source: " . $this->source);
+
   }
 }
