@@ -70,6 +70,7 @@ USER hubdrop
 # RUN cd /var/hubdrop/app && composer install
 
 WORKDIR /var/hubdrop
+ENV HOME /var/hubdrop
 
 # Set the container's command to our script.
 CMD ["hubdrop-entrypoint.sh"]
