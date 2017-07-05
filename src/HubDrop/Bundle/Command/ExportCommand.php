@@ -22,7 +22,7 @@ class ExportCommand extends ContainerAwareCommand
         'f',
         InputOption::VALUE_OPTIONAL,
         'The name of the file to save. Defaults to ~/sources.yml',
-        $_ENV['HOME'] . '/sources.yml'
+        $_SERVER['HOME'] . '/sources.yml'
       )
     ;
   }

@@ -166,7 +166,7 @@ class Project {
     }
 
     // Lookup sources.yml
-    $sources_overrides = Yaml::parse(file_get_contents($_ENV['HOME'] . "/sources.yml"));
+    $sources_overrides = Yaml::parse(file_get_contents($_SERVER['HOME'] . "/sources.yml"));
 
     // If there is a source override, and it is different than the found source, run setSource();
     if (isset($sources_overrides[$this->name]) && $sources_overrides[$this->name] != $source) {
@@ -378,10 +378,10 @@ class Project {
     }
 
     // Save results to sources.yml
-    $sources = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($_ENV['HOME'] . '/sources.yml'));
+    $sources = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($_SERVER['HOME'] . '/sources.yml'));
     $sources[$this->name] = $source;
     $yaml = \Symfony\Component\Yaml\Yaml::dump($sources);
-    file_put_contents($_ENV['HOME'] . '/sources.yml', $yaml);
+    file_put_contents($_SERVER['HOME'] . '/sources.yml', $yaml);
   }
 
   /**
