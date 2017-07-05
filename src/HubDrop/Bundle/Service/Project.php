@@ -818,7 +818,7 @@ $team_id_admin = $team['id'];
     $params = array();
     $params['name'] = 'web';
     $params['config'] = array();
-    $params['config']['url'] = 'http://' . $this->hubdrop->url . '/webhook';
+    $params['config']['url'] = 'https://' . $this->hubdrop->url . '/webhook';
     $params['config']['content_type'] = 'json';
 
     $hook = $hooks->create($this->github_organization, $this->name, $params);

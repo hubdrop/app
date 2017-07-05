@@ -7,7 +7,7 @@ parameters:
     app.github.organization: drupalprojects
     app.drupal.username: hubdrop
     app.drupal.password: hubdrop
-    app.url: hubdrop.org
+    app.url: www.hubdrop.org
     app.repo_path: /var/hubdrop/repos
     app.jenkins_url: jenkins:8080
     app.jenkins_username: hubdrop
