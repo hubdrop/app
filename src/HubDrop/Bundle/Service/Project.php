@@ -660,7 +660,7 @@ $team_id_admin = $team['id'];
     // The project page, hopefully
     $link = $mink->getSession()->getPage()->findLink('Maintainers');
     if (!$link) {
-      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $mink->getSession()->getCurrentUrl() . 'username pass: ' . $this->hubdrop->drupal_username .' ' . $this->hubdrop->drupal_password);
+      throw new \Exception('Unable to access project maintainers list. Add "hubdrop" to the project, allowing Write to VCS and Administer Maintainers. URL: ' . $mink->getSession()->getCurrentUrl());
     }
 
     // Click "Maintainers"
